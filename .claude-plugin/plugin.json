@@ -1,0 +1,5 @@
+{
+  "name": "kargnas-skills",
+  "description": "Kargnas' agent skills — AI-ready project setup, VS Code scaffolding, and skill authoring/hardening tools for Claude Code, Codex, and OpenCode",
+  "version": "1.0.0"
+}
