@@ -29,6 +29,7 @@ Claude Code native plugin path:
 | `vscode-ready` | Scaffolds one-click VS Code/Cursor debug and task configs (launch.json, tasks.json, settings.json) from the detected stack |
 | `skill-manager` | Create, evaluate, harden, and merge agent skills — includes guides for anti-patterns, modular architecture, and importing external skills |
 | `skill-prompter` | Rewrites skill descriptions and step prompts for reliable triggering and compliance — includes rewrite patterns and a compliance checklist |
+| `humanizer-kill-gpt` | Removes GPT-specific writing tells from English and Korean text, including English source constructs that survive translation and Korean-surface translationese |
 
 ## Contributing
 
