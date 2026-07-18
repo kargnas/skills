@@ -1,11 +1,15 @@
 ---
 name: humanizer-kill-gpt
-description: Removes GPT-specific writing tells from English and Korean text, including English source constructs that survive translation and Korean-surface translationese. Use when de-GPTing a draft, polishing English bound for Korean readers, or removing robotic contrast frames, hedging, forced lists, and translated AI phrasing.
+description: "Runs a cross-language cleanup for writing tells shared by large frontier LLMs, not only GPT: English source constructs that survive Korean translation and Korean-surface translationese. Triggers on de-GPT, GPT 티, AI 티, 번역체 GPT, 자폐 말투 (colloquial shorthand for rigid or over-complete model prose, not a claim about autism), or English text bound for Korean; broad Korean punctuation and spacing cleanup stays out of scope."
 ---
 
 # Humanizer: Kill GPT Tells
 
-Remove GPT/AI fingerprints from English and Korean text. Most GPT-like Korean translated from English starts upstream: an English GPT construct survives literal translation. This skill therefore uses two coupled passes.
+Remove recurring AI-writing fingerprints from English and Korean text. Despite the skill name, these patterns are not unique to GPT: large frontier language models commonly converge on the same over-complete, over-explained, overly balanced, and translation-shaped prose. The catalog keeps “GPT tell” as a familiar shorthand.
+
+Some users call this style `자폐 말투`. Treat that phrase only as colloquial request vocabulary for rigid or socially miscalibrated model prose. MUST NOT equate the writing patterns with autism or use the phrase to characterize autistic people.
+
+Most translated Korean tells start upstream: an English model-writing construct survives literal translation. This skill therefore uses two coupled passes.
 
 | Text situation | Run |
 |---|---|
@@ -13,27 +17,179 @@ Remove GPT/AI fingerprints from English and Korean text. Most GPT-like Korean tr
 | Korean draft written natively | Pass B only |
 | Korean translated from English, or English that will be translated to Korean | Pass A first, then Pass B |
 
-This skill targets GPT-specific cross-language patterns. A broader Korean-language cleanup workflow may cover additional punctuation, spacing, and lexical-distribution patterns that are outside this skill's scope.
+This skill targets cross-language patterns shared by large frontier models. A broader Korean-language cleanup workflow may cover additional punctuation, spacing, and lexical-distribution patterns that are outside this skill's scope.
 
 When the user asks for generation-time speaking guidance instead of post-editing, read [references/generative-speaking-directive.md](references/generative-speaking-directive.md). Do not invert the catalog into a long prohibition list. Correct the three root behaviors instead: exhaustive coverage, over-helping, and formal-writing defaults.
 
 ## Procedure
 
-1. **Detect language and origin.** Choose the applicable passes from the table above. If the user says the Korean came from English, or the English will be translated, Pass A is mandatory.
-   - An English draft paired with a Korean-targeted request is not a mismatch. Treat it as English intended for Korean readers and remove the source constructs that would become Korean translationese.
-2. **Scan** the text against every pattern in the applicable passes.
-3. **Flag** each hit with the exact line, category, and reason it reads as a GPT tell. For translated text, name both the English source construct and the Korean tell it produces.
-4. **Propose a natural replacement.** Preserve meaning and change only the GPT-shaped wording. Read [guides/natural-korean-patterns.md](guides/natural-korean-patterns.md) for Korean endings, connectors, and politeness, and [guides/english-source-constructs.md](guides/english-source-constructs.md) for English-to-Korean mappings.
-5. **Apply** the fixes, or present a diff when the user requests review first.
-6. **Re-scan** after editing. Confirm that no GPT tell survived and no replacement introduced another one. For translation-bound text, verify that the rewritten English will not regenerate a Korean tell.
+### Input contract
 
-Never replace one GPT tell with another. Check each proposed replacement against the full catalog before using it.
+Resolve `INPUT_TEXT` before [S1].
+
+- `SKILL_DIR` MUST be the absolute directory containing this `SKILL.md`. If the host exposes only an installed alias, run `realpath "{installed-skill-path}"` and use the returned directory.
+- Preserve the source line breaks and number them from 1 for findings output.
+- Initialize `A_HITS=[]` and `B_HITS=[]` before route-specific scans.
+
+| Input condition | Exact action |
+|---|---|
+| Text is present in the current conversation | Use that text verbatim as `INPUT_TEXT`; no external tool call is required |
+| User supplies a file path | Run `sed -n '1,240p' "{path}"`; continue with `sed -n '241,480p'` and later ranges until EOF |
+| No text or file is available | MUST ask one short question requesting the text, then wait |
+
+### Step 1 [S1]: Select the execution route
+
+**Tool**: Current-context language classification; no external command or model.
+
+**Action**: MUST classify `INPUT_TEXT` with the decision table below. Use in-context language analysis; MUST NOT call an external rewriting model.
+
+| Condition | Set `ROUTE` | Required path |
+|---|---|---|
+| English text that stays English | `A` | [S2] → [S3] → [S5]–[S9] |
+| Korean text written natively | `B` | [S2] → [S4]–[S9] |
+| Korean translated from English | `A+B` | [S2]–[S9] |
+| English text intended for Korean readers or later translation | `A+B` | [S2]–[S9]; [S4] performs a prospective Korean-tell check |
+| User requests generation-time persona or speaking guidance instead of post-editing | `DIRECTIVE` | [S2] → [S9] |
+
+**VERIFY [S1]**: A working line exists in the form `Route: {A|B|A+B|DIRECTIVE}` and exactly one route is selected.
+
+### Step 2 [S2]: Load the route references
+
+**Tool**: The host's file-read tool; fallback to the shell command `sed`.
+
+**Action**: MUST read the files selected below from `SKILL_DIR`, the directory containing this `SKILL.md`.
+
+| `ROUTE` from [S1] | Exact file-read path |
+|---|---|
+| `A` | `{SKILL_DIR}/guides/english-source-constructs.md` |
+| `B` | `{SKILL_DIR}/guides/natural-korean-patterns.md` |
+| `A+B` | Read both guide paths above |
+| `DIRECTIVE` | `{SKILL_DIR}/references/generative-speaking-directive.md` |
+
+**IF BLOCKED**: If the host has no file-read tool, MUST run `sed -n '1,240p' "{exact-path}"` and continue with later 240-line ranges until EOF. If a guide still cannot be read, use the inline catalog below and disclose the missing guide in the final response.
+
+**VERIFY [S2]**: Every file required by the selected route was read through EOF, or its missing-path fallback was recorded.
+
+### Step 3 [S3]: Scan English source constructs
+
+**Tool**: Current-context sentence comparison; no external rewriting model or web service.
+
+**Action**: For `ROUTE=A` or `ROUTE=A+B`, MUST compare `INPUT_TEXT` against all 14 Pass A body rows exactly once, in table order. Use in-context text analysis; MUST NOT rewrite during this step. Store each match as `A_HITS` with fields `line`, `source span`, `pattern`, `reason`, and `Korean consequence`.
+
+**VERIFY [S3]**: The working record states `A_ROWS_CHECKED=14`; `A_HITS` contains one record per Pass A match, including zero records when no match exists.
+
+### Step 4 [S4]: Scan Korean-surface tells
+
+**Tool**: Current-context sentence comparison; no external rewriting model or web service.
+
+**Action**: For `ROUTE=B` or Korean `ROUTE=A+B`, MUST compare `INPUT_TEXT` against B1–B7 exactly once, section order first and row order second. For English `ROUTE=A+B`, MUST instead test whether a literal Korean translation of each sentence would regenerate any B1–B7 tell. Store matches as `B_HITS` with fields `line`, `pattern`, and `reason`.
+
+**VERIFY [S4]**: `B_HITS` contains one record per applicable B1–B7 match, including zero records when no match exists; every applicable section was checked.
+
+### Step 5 [S5]: Build the findings table
+
+**Tool**: Current-context table synthesis; no external tool.
+
+**Action**: MUST assign every hit `DEDUP_KEY={line}|{source span}`, merge `A_HITS` and `B_HITS` by that key, and produce the exact structure below. `source span` means the smallest contiguous substring that triggered one or more categories; MUST NOT widen it to the whole line. Overlapping or nested hits share one key, while non-overlapping hits on the same line keep separate keys. Combine every category and reason attached to the same key in one row. Each replacement MUST preserve facts, certainty, intensity, register, and intentional code-switching.
+
+```text
+| Original line | Pass/category | Why it reads as model-written | Proposed replacement |
+```
+
+For translation-bound text, the same row MUST name the English source construct and the Korean tell it would produce. A proposed replacement MUST be checked against the full catalog before inclusion.
+
+**VERIFY [S5]**: The table row count equals the count of distinct `DEDUP_KEY` values; no key appears twice, and every row has a concrete replacement that introduces no cataloged tell.
+
+### Step 6 [S6]: Apply the requested edit mode
+
+**Tool**: Current-context text rewriting; no file-write tool unless the user explicitly requested an in-place file edit.
+
+**Action**: MUST select one mode from the decision table and produce `EDITED_TEXT`.
+
+| Condition | Required action |
+|---|---|
+| User explicitly requests no edits, review only, findings only, or diff only | Set `EDITED_TEXT=INPUT_TEXT`; preserve the findings table as the proposed diff |
+| Findings exist and review-only mode was not requested | Apply every proposed replacement to a full rewritten text |
+| No findings exist | Set `EDITED_TEXT=INPUT_TEXT` without cosmetic rewriting |
+
+**VERIFY [S6]**: `EDITED_TEXT` exists, preserves the source meaning, and reflects exactly one mode from the table.
+
+### Step 7 [S7]: Run the deterministic residual gate
+
+**Tool**: Execute the bundled `scripts/residual_check.py` with `python3 "{SKILL_DIR}/scripts/residual_check.py"`. Replace `{SKILL_DIR}` with the absolute path resolved in the input contract. Reading the script is unnecessary but MUST NOT replace execution.
+
+**Action**: MUST map the findings-table categories to the deterministic IDs below, deduplicate the IDs, and pipe the complete `EDITED_TEXT` from [S6] to the script. In review-only mode, pipe the proposed replacement text instead of unchanged source lines. The residual-check command MUST be the first and only shell invocation in this step. Keep the JSON result in the current response context; MUST NOT write `EDITED_TEXT`, script output, or intermediate findings to any file, including a temporary file.
+
+| Findings category | Deterministic ID |
+|---|---|
+| Negative parallelism | `negative-parallelism` |
+| Rule of three | `rule-of-three` |
+| Copula avoidance | `copula-avoidance` |
+| Fit assertion | `fit-assertion` |
+| Significance inflation | `significance-inflation` |
+| `-ing` tail clause | `ing-tail` |
+| Corporate softener | `corporate-softener` |
+| Signposting | `signposting` |
+
+Set `CATEGORY_FLAGS` to one `--category {deterministic-id}` flag per unique mapped ID. If the findings contain none of these categories, set `CATEGORY_FLAGS=--category none`.
+
+```bash
+python3 "{SKILL_DIR}/scripts/residual_check.py" {CATEGORY_FLAGS} <<'EDITED_TEXT'
+{complete EDITED_TEXT or proposed replacement text}
+EDITED_TEXT
+```
+
+The script emits one JSON object and uses exit codes `0=pass`, `1=residual found`, `2=invalid invocation or input`.
+
+| Script result | Required action |
+|---|---|
+| Exit `0`, JSON `status=pass` | Set `deterministic_remaining=0`; continue to [S8] |
+| Exit `1`, JSON findings present | Rewrite only the reported spans, then repeat [S7] once |
+| Second exit `1` | Set `deterministic_unresolved` to the reported findings; go directly to [S9] and disclose them |
+| Exit `2` | Fix the invocation or input named in JSON, then repeat [S7] once |
+| Second exit `2` | Go directly to [S9] and disclose that deterministic verification failed |
+
+**IF BLOCKED**: If the direct `python3` command exits `127`, run the same command once with `python`. If that also exits `127`, go directly to [S9] and disclose that the deterministic gate was unavailable.
+
+**VERIFY [S7]**: Before [S8], the residual-check command exits `0`; JSON has `status=pass` and `finding_count=0`; `checked_categories` exactly matches the unique mapped IDs, or is empty only when `--category none` was used; S7 used no `ls`, `stat`, `which`, or artifact-write call.
+
+### Step 8 [S8]: Re-scan the full catalog
+
+**Tool**: Current-context sentence comparison using the same catalogs loaded in [S2].
+
+**Action**: MUST compare every proposed replacement first with the category that triggered its row, then repeat the applicable [S3] and [S4] comparison order against `EDITED_TEXT`. In review-only mode, scan the proposed replacement text. A synonym that retains the same structure MUST count as `same_category_remaining`.
+
+| Re-scan result | Required action |
+|---|---|
+| `same_category_remaining=0` and no other avoidable tell remains | Continue to [S9] |
+| A replacement retains its source category or introduces another tell | Rewrite only that replacement, then repeat [S7] → [S8] once |
+| The repeated [S7] or [S8] still fails | Set `unresolved` to the remaining items and continue to [S9] without claiming a clean result |
+
+**VERIFY [S8]**: The re-scan record lists `same_category_remaining`, `remaining`, `introduced`, and `unresolved`; a clean result requires the first three counts to equal `0`.
+
+### Step 9 [S9]: Deliver the result
+
+**Tool**: The host's final-response renderer; MUST NOT write an artifact unless the user requested one.
+
+**Action**: MUST emit exactly one output shape from the decision table.
+
+| Condition | Output shape |
+|---|---|
+| `ROUTE=DIRECTIVE` | Generation-time directive from the loaded reference, followed by one short rationale |
+| No findings | `Route: {ROUTE}` followed by `GPT/frontier-model tells: none` |
+| [S7] verifier unavailable or errored twice | Route line → findings table → proposed or edited text → verifier error; MUST NOT claim a clean re-scan |
+| Review-only mode | Route line → findings table → proposed diff or replacement text → deterministic and full-catalog forecast |
+| Applied mode | Route line → findings table → complete `EDITED_TEXT` → `Re-scan: deterministic_remaining=0, same_category_remaining=0, remaining={N}, introduced=0, unresolved={N}` |
+
+**VERIFY [S9]**: The response contains the selected route and required artifacts. Post-editing routes include the actual deterministic plus full-catalog status without overstating success; `DIRECTIVE` omits scan status by design.
+
+MUST NOT replace one model-writing tell with another. MUST preserve all existing functionality and the user's intended voice.
 
 ---
 
 ## Pass A: English source constructs
 
-These English-side habits produce recognizable Korean translationese. Removing them in English is the cleanest fix. See [guides/english-source-constructs.md](guides/english-source-constructs.md) for detailed before-and-after examples.
+These English-side habits occur across large frontier LLMs and produce recognizable Korean translationese. Removing them in English is the cleanest fix. See [guides/english-source-constructs.md](guides/english-source-constructs.md) for detailed before-and-after examples.
 
 Negative parallelism is the highest-priority pattern to rewrite.
 
@@ -163,12 +319,4 @@ Do not damage natural text through over-correction:
 - Preserve a consistent nonstandard spacing pattern or voice when it is intentional.
 - In English, preserve an intentional single em dash, real terms of art, and the author's own asserted strength.
 
-## Output format
-
-Present findings in a table before applying them:
-
-```text
-| Original line | Pass/category | Why it reads as GPT | Replacement |
-```
-
-For translation-bound text, include the English source construct and the Korean tell in the same row. After editing, show the complete revised text and report the re-scan result in one line. If there are no hits, say `GPT tells: none`.
+The mandatory output contract is defined in [S5] and [S9]. MUST NOT substitute another format.

@@ -1,46 +1,105 @@
 # kargnas/skills
 
-Agent skills for [Claude Code](https://docs.anthropic.com/en/docs/claude-code), Codex, and [OpenCode](https://opencode.ai). Each skill is a self-contained `skills/<name>/SKILL.md` folder following the standard agent-skills layout, so any tool that reads that layout can consume this repo.
+[Claude Code](https://docs.anthropic.com/en/docs/claude-code), Codex,
+[OpenCode](https://opencode.ai)에서 사용할 수 있는 에이전트 스킬 모음입니다.
 
-## Install
+각 스킬은 표준 에이전트 스킬 구조인 `skills/<이름>/SKILL.md` 형태로 독립되어 있습니다. 현재 설치 가능한 스킬은 5개입니다.
 
-Using [`npx skills`](https://github.com/vercel-labs/skills) (works for Claude Code, Codex, OpenCode, and more):
+## 전체 스킬 설치
+
+[`npx skills`](https://github.com/vercel-labs/skills)로 모든 스킬을 한 번에 설치합니다.
 
 ```bash
-# All skills
-npx -y skills add kargnas/skills
+npx -y skills add kargnas/skills --skill '*'
+```
 
-# One skill
+설치 대상을 직접 선택하려면 다음 명령을 사용합니다.
+
+```bash
+npx -y skills add kargnas/skills
+```
+
+전역 설치가 필요하면 원하는 명령 끝에 `--global`을 붙입니다.
+
+## 개별 스킬 설치
+
+### `ai-ready`
+
+프로젝트를 분석해 `AGENTS.md`, 디버깅·테스트 환경, CI, 문서를 정비합니다.
+
+```bash
 npx -y skills add kargnas/skills --skill ai-ready
 ```
 
-Claude Code native plugin path:
+### `vscode-ready`
 
+프로젝트 기술 스택에 맞는 VS Code/Cursor 실행, 디버그, 작업, 설정 파일을 구성합니다.
+
+```bash
+npx -y skills add kargnas/skills --skill vscode-ready
 ```
+
+### `skill-manager`
+
+스킬의 생성, 수정, 병합, 분리, 구조 정리, 외부 스킬 가져오기를 관리합니다.
+
+```bash
+npx -y skills add kargnas/skills --skill skill-manager
+```
+
+### `skill-prompter`
+
+스킬 단계가 누락되지 않도록 RFC 2119 표현, 명시적 도구, 검증 절차, 이름과 설명을 다듬습니다.
+
+```bash
+npx -y skills add kargnas/skills --skill skill-prompter
+```
+
+### `humanizer-kill-gpt`
+
+영어와 한국어 글에서 반복되는 GPT·LLM 특유의 문장 구조, 번역체, 과잉 설명을 제거합니다.
+
+```bash
+npx -y skills add kargnas/skills --skill humanizer-kill-gpt
+```
+
+## Claude Code 플러그인으로 설치
+
+Claude Code에서는 이 저장소를 플러그인 마켓플레이스로 추가할 수도 있습니다.
+
+```text
 /plugin marketplace add kargnas/skills
+```
+
+```text
 /plugin install kargnas-skills@kargnas/skills
 ```
 
-## Skills
+## 스킬 목록
 
-| Skill | What it does |
-|---|---|
-| `ai-ready` | Transforms a project into an AI-ready codebase — AGENTS.md migration, `.env.ai-ready` setup, static analysis and test debugging, CI workflows, and README refresh |
-| `vscode-ready` | Scaffolds one-click VS Code/Cursor debug and task configs (launch.json, tasks.json, settings.json) from the detected stack |
-| `skill-manager` | Create, evaluate, harden, and merge agent skills — includes guides for anti-patterns, modular architecture, and importing external skills |
-| `skill-prompter` | Rewrites skill descriptions and step prompts for reliable triggering and compliance — includes rewrite patterns and a compliance checklist |
-| `humanizer-kill-gpt` | Removes GPT-specific writing tells from English and Korean text, including English source constructs that survive translation and Korean-surface translationese |
+| 스킬 | 용도 |
+| --- | --- |
+| [`ai-ready`](skills/ai-ready/) | 프로젝트를 AI 에이전트가 작업하기 쉬운 구조로 정비 |
+| [`vscode-ready`](skills/vscode-ready/) | VS Code/Cursor의 실행·디버그·작업 설정 생성 |
+| [`skill-manager`](skills/skill-manager/) | 스킬 구조와 전체 생명주기 관리 |
+| [`skill-prompter`](skills/skill-prompter/) | 스킬 지시문의 실행 준수율과 트리거 문구 개선 |
+| [`humanizer-kill-gpt`](skills/humanizer-kill-gpt/) | 영어·한국어 글의 GPT·LLM 문체 흔적 제거 |
 
-## Contributing
+## 기여 방법
 
-PRs are welcome. Rules:
+Pull Request를 보낼 때 다음 규칙을 지켜 주세요.
 
-1. One skill per `skills/<name>/` folder with a `SKILL.md` (YAML frontmatter: `name`, `description`).
-2. Keep skills self-contained — reference files go under the skill's own `references/`, scripts under `scripts/`.
-3. No secrets, no personal data, no company-internal URLs. English for `SKILL.md` body.
+1. 스킬 하나당 `skills/<이름>/` 디렉터리 하나와 `SKILL.md` 하나를 둡니다.
+2. `SKILL.md`의 YAML frontmatter에는 `name`과 `description`을 작성합니다.
+3. 참조 문서는 해당 스킬의 `references/`, 실행 스크립트는 `scripts/`에 둡니다.
+4. 비밀 정보, 개인정보, 회사 내부 URL을 포함하지 않습니다.
+5. `SKILL.md` 본문은 영어로 작성합니다.
 
-## License
+## 라이선스
 
-[PolyForm Noncommercial 1.0.0](LICENSE) — free for personal, research, and other noncommercial use. Commercial use requires a separate license from the author.
+[PolyForm Noncommercial 1.0.0](LICENSE)에 따라 개인, 연구 및 기타 비상업적
+용도로 무료 사용할 수 있습니다. 상업적 이용에는 저자의 별도 허가가 필요합니다.
 
-Note: `skills/skill-manager` contains portions derived from Anthropic's skill-creator (Apache-2.0); see `skills/skill-manager/LICENSE.txt`.
+`skills/skill-manager`에는 Anthropic의 `skill-creator`에서 파생된 Apache-2.0
+라이선스 코드가 일부 포함되어 있습니다. 자세한 내용은
+[`skills/skill-manager/LICENSE.txt`](skills/skill-manager/LICENSE.txt)를 확인하세요.
