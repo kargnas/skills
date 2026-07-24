@@ -360,7 +360,7 @@ Run the same black-box scenario across BOTH validation lanes:
 | Lane (ALL on `opencode-go/*`) | Required |
 |------|---------------------|
 | Cost-efficient | ≥3 distinct small/fast families: Kimi, Deepseek-flash, GLM, MiniMax, Qwen-plus, Mimo |
-| Higher-capability | ≥1 of `qwen3.7-max`, `minimax-m3`, `deepseek-v4-pro` |
+| Higher-capability | ≥1 of `qwen3.7`, `minimax-m3`, `deepseek-v4-pro` |
 
 Each validator is one `opencode run`. Write the black-box prompt (improved SKILL.md + scenario + signal schema, NO answer keys) to a temp file once, then:
 
