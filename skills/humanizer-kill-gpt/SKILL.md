@@ -241,7 +241,7 @@ These machine-translated structures sound immediately unnatural to native speake
 | `...정도로 넓혀도 N건 수준이라` | Stacks `정도` and `수준` | State the number directly |
 | `넓히다`, `좁히다` for abstract scope | Overused metaphor | `늘리다/줄이다`, `확대하다/축소하다` |
 | `열다`, `닫다`, `굴리다` for discussions or businesses | Overused physical metaphor | `시작하다`, `마무리하다`, `정리하다`, `다루다` |
-| `두께` for abstract data, relationships, or experience | Literal "depth/thickness" metaphor | Use `양`, `깊이`, or explain what accumulated |
+| `두께`, `두텁다` for abstract data, relationships, or experience | Literal "depth/thickness" metaphor | Use `양`, `깊이`, or explain what accumulated |
 | `척추`, `등뼈` for a business or system | Literal body metaphor | `근간`, `뼈대`, `토대`, `기반` |
 | `-지는 않았습니다` | Unnecessary reservation | End with a direct assertion |
 | `...쪽이었고` | Padding through `쪽` | Use `~였고` |
