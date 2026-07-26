@@ -3,7 +3,7 @@
 [Claude Code](https://docs.anthropic.com/en/docs/claude-code), Codex,
 [OpenCode](https://opencode.ai)에서 사용할 수 있는 에이전트 스킬 모음입니다.
 
-각 스킬은 표준 에이전트 스킬 구조인 `skills/<이름>/SKILL.md` 형태로 독립되어 있습니다. 현재 설치 가능한 스킬은 5개입니다.
+각 스킬은 표준 에이전트 스킬 구조인 `skills/<이름>/SKILL.md` 형태로 독립되어 있습니다. 현재 설치 가능한 스킬은 6개입니다.
 
 ## 전체 스킬 설치
 
@@ -63,6 +63,14 @@ npx -y skills add kargnas/skills --skill skill-prompter
 npx -y skills add kargnas/skills --skill humanizer-kill-gpt
 ```
 
+### `git-lore`
+
+Git trailer로 커밋의 결정 배경을 기록하고 조회하며, 프로젝트 또는 전역 에이전트 지침에 Lore 형식을 설정합니다.
+
+```bash
+npx -y skills add kargnas/skills --skill git-lore
+```
+
 ## Claude Code 플러그인으로 설치
 
 Claude Code에서는 이 저장소를 플러그인 마켓플레이스로 추가할 수도 있습니다.
@@ -84,6 +92,7 @@ Claude Code에서는 이 저장소를 플러그인 마켓플레이스로 추가�
 | [`skill-manager`](skills/skill-manager/) | 스킬 구조와 전체 생명주기 관리 |
 | [`skill-prompter`](skills/skill-prompter/) | 스킬 지시문의 실행 준수율과 트리거 문구 개선 |
 | [`humanizer-kill-gpt`](skills/humanizer-kill-gpt/) | 영어·한국어 글의 GPT·LLM 문체 흔적 제거 |
+| [`git-lore`](skills/git-lore/) | Captures, queries, and configures decision context in native Git trailers |
 
 ## 기여 방법
 
