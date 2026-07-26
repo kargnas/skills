@@ -1,9 +1,9 @@
 # kargnas/skills
 
-[Claude Code](https://docs.anthropic.com/en/docs/claude-code), Codex,
-[OpenCode](https://opencode.ai)에서 사용할 수 있는 에이전트 스킬 모음입니다.
+제가 [Claude Code](https://docs.anthropic.com/en/docs/claude-code), Codex,
+[OpenCode](https://opencode.ai)에서 사용하고 있는 스킬들 중 일부를 발췌하여 올렸습니다.
 
-각 스킬은 표준 에이전트 스킬 구조인 `skills/<이름>/SKILL.md` 형태로 독립되어 있습니다. 현재 설치 가능한 스킬은 6개입니다.
+각 스킬은 표준 에이전트 스킬 구조인 `skills/<이름>/SKILL.md` 형태로 독립되어 있습니다.
 
 ## 전체 스킬 설치
 
@@ -94,21 +94,7 @@ Claude Code에서는 이 저장소를 플러그인 마켓플레이스로 추가�
 | [`humanizer-kill-gpt`](skills/humanizer-kill-gpt/) | 영어·한국어 글의 GPT·LLM 문체 흔적 제거 |
 | [`git-lore`](skills/git-lore/) | Captures, queries, and configures decision context in native Git trailers |
 
-## 기여 방법
-
-Pull Request를 보낼 때 다음 규칙을 지켜 주세요.
-
-1. 스킬 하나당 `skills/<이름>/` 디렉터리 하나와 `SKILL.md` 하나를 둡니다.
-2. `SKILL.md`의 YAML frontmatter에는 `name`과 `description`을 작성합니다.
-3. 참조 문서는 해당 스킬의 `references/`, 실행 스크립트는 `scripts/`에 둡니다.
-4. 비밀 정보, 개인정보, 회사 내부 URL을 포함하지 않습니다.
-5. `SKILL.md` 본문은 영어로 작성합니다.
-
 ## 라이선스
 
 [PolyForm Noncommercial 1.0.0](LICENSE)에 따라 개인, 연구 및 기타 비상업적
 용도로 무료 사용할 수 있습니다. 상업적 이용에는 저자의 별도 허가가 필요합니다.
-
-`skills/skill-manager`에는 Anthropic의 `skill-creator`에서 파생된 Apache-2.0
-라이선스 코드가 일부 포함되어 있습니다. 자세한 내용은
-[`skills/skill-manager/LICENSE.txt`](skills/skill-manager/LICENSE.txt)를 확인하세요.
