@@ -759,7 +759,14 @@ Every skill creation, modification, merge, or split MUST end with a dry-run veri
    | Black-box subagent delegation (preferred) | Spawn validators loaded with ONLY the skill metadata/body, the scenario, allowed tools, and the signal table below. The prompt MUST NOT include expected answers, examples, diffs, known weak points, or implementation notes. |
    | Manual walkthrough | Pretend the original conversation does not exist. For each step in the skill body, name the exact action you would invoke given only what the skill provides. Do NOT use hidden expected answers. |
 
-   MUST run the same black-box scenario through both validation lanes:
+   **Validator count scales with skill size.** Measure `wc -l SKILL.md` on the skill under test (for merge/split, measure each resulting skill separately and tier each one independently). A 25-line skill has almost no surface to skip a step on, so a 6-validator fan-out buys nothing but cost:
+
+   | SKILL.md size | Required validators |
+   |---------------|---------------------|
+   | ≤ 30 lines | Two cost-efficient validators from different families (e.g. one Sonnet-family + one GLM-family). No frontier lane. |
+   | > 30 lines | Both lanes below, in full. |
+
+   For skills over 30 lines, MUST run the same black-box scenario through both validation lanes:
 
    | Lane | Required validators |
    |------|---------------------|
@@ -768,7 +775,7 @@ Every skill creation, modification, merge, or split MUST end with a dry-run veri
 
    **Validator model policy (HARD): Fable/Mythos-class models (`claude-fable-*`, `claude-mythos-*`) are FORBIDDEN for dry-run.** "High-cost frontier" MUST NOT be read as "most expensive model available": dry-run fans out across many validators, so the validator model's per-token price multiplies with no added verification value. The ban covers every route — explicit model flags, harness subagent delegation, and model inheritance (a Fable-class parent session MUST pass an explicit non-Fable model on every validator or orchestrator spawn). The Claude-family default for dry-run work is Sonnet (latest); Opus MAY be used ONLY on the user's explicit request.
 
-   If a required model family is unavailable, run every available validator and write `DRYRUN_PENDING.md` with the missing family. The dry-run is not PASS until all required lanes run or the user explicitly accepts the gap.
+   If a model family required by the skill's size tier is unavailable, run every available validator and write `DRYRUN_PENDING.md` with the missing family. The dry-run is not PASS until every lane required by that tier runs or the user explicitly accepts the gap.
 
 3. **Verify these signals during the simulated run:**
 
@@ -780,7 +787,7 @@ Every skill creation, modification, merge, or split MUST end with a dry-run veri
    | Outputs | The simulator produces an artifact in the documented final shape |
    | No silent skips | No step is bypassed without an explicit, documented reason |
    | No answer leakage | Validator prompts contain no few-shot hints, expected outputs, weak-point notes, or pass/fail explanations |
-   | Model coverage | Sonnet, Kimi, GLM, and frontier validators all ran the same black-box scenario; ZERO validators ran on a Fable/Mythos-class model |
+   | Model coverage | Every validator required by the skill's size tier ran the same black-box scenario (≤30 lines: two cost-efficient families; >30 lines: Sonnet, Kimi, GPT-mini, Deepseek-flash, GLM, and frontier); ZERO validators ran on a Fable/Mythos-class model |
 
 4. **For merged skills:** verify that every use case from each original skill still works. Run one scenario per original skill against the merged skill — every original use case MUST pass.
 
@@ -848,5 +855,5 @@ Before considering a skill complete (whether newly created or modified), verify 
 - [ ] At least 3 example user requests that should trigger the skill have been verified
 - [ ] The skill works with a fresh Claude instance (no hidden context dependencies)
 - [ ] **Sanitization pass complete** — every LLM model ID in SKILL.md, scripts, and references is CURRENT, or the user explicitly declined the upgrade for that finding (see "Sanitization Pass" section above)
-- [ ] **Dry-run verification passed** every signal, including black-box prompt hygiene and Sonnet/Kimi/GLM/frontier model coverage (see "Dry Run Verification" section above) — REQUIRED for any skill that was created, modified, merged, or split
+- [ ] **Dry-run verification passed** every signal, including black-box prompt hygiene and the model coverage required by the skill's size tier (see "Dry Run Verification" section above) — REQUIRED for any skill that was created, modified, merged, or split
 - [ ] **No `DRYRUN_PENDING.md`** present in the skill directory (skill-manager-tracked skills) OR `tracker.py show` reports `Latest signals: PASS` for skill-prompter-tracked skills
