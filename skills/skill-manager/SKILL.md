@@ -770,8 +770,8 @@ Every skill creation, modification, merge, or split MUST end with a dry-run veri
 
    | Lane | Required validators |
    |------|---------------------|
-   | Cost-efficient | Run all five exact models: `opencode-go/gpt-5.6-luna`, `opencode-go/glm-5.2`, `opencode-go/mimo-v2.5`, `opencode-go/minimax-m3`, `opencode-go/qwen3.7-plus` |
-   | Higher-capability | Run at least one exact model: `opencode-go/qwen3.8-max`, `opencode-go/kimi-k3`, `opencode-go/grok-4.5`, or `opencode-go/mimo-v2.5-pro` |
+   | Cost-efficient | Run all five exact models: `opencode-go/gpt-5.6-luna`, `opencode-go/deepseek-v4-flash`, `opencode-go/glm-5.2`, `opencode-go/mimo-v2.5`, `opencode-go/qwen3.7-plus` |
+   | Higher-capability | Run at least one exact model: `opencode-go/qwen3.8-max`, `opencode-go/kimi-k3`, `opencode-go/minimax-m3`, `opencode-go/deepseek-v4-pro`, or `opencode-go/mimo-v2.5-pro` |
 
    **Validator model policy (HARD): every validator MUST use an exact `opencode-go/*` ID from the allowlist above.** Do NOT substitute another provider or an older revision.
 
