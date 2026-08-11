@@ -308,7 +308,7 @@ python3 {SKILL_PROMPTER_DIR}/scripts/tracker.py record --skill "{SKILL_NAME}" \
 
 ### Phase 7: Self-Audit (Static)
 
-**Action**: Re-read the improved SKILL.md as if you are a weaker LLM (MiniMax M2.7, GLM-5 or Deepseek V4 Flash through `opencode-go` provider with OpenCode CLI). This phase is a STATIC text review — Phase 8 will dynamically execute the skill.
+**Action**: Re-read the improved SKILL.md as if you are a cost-efficient validator (`gpt-5.6-luna`, `deepseek-v4-flash`, or `glm-5.2` through the `opencode-go` provider with OpenCode CLI). This phase is a STATIC text review — Phase 8 will dynamically execute the skill.
 
 For EACH step, ask:
 1. Can I execute this with ZERO prior context? (Must be YES)
@@ -349,18 +349,12 @@ Run the same black-box scenario across BOTH validation lanes:
 
 **Provider scope (HARD): validators run on `opencode-go/*` ONLY.** All metered (종량제) providers — `opencode/*`, `anthropic/*`, `openai/*`, `github-copilot/*`, `google/*` — are FORBIDDEN for dry-run testing as standing policy, regardless of remaining budget. A family absent from `opencode-go` is simply unavailable; do NOT reach outside it.
 
-**Model-tier scope (HARD): Fable/Mythos-class models are FORBIDDEN for dry-run.** Dry-run is multi-validator fan-out, so the validator model's per-token price multiplies across every run — Fable pricing buys zero extra compliance-checking accuracy there. The ban covers EVERY route: explicit `--model` flags, harness subagent delegation, and model inheritance (a Fable-class parent session MUST pass an explicit non-Fable model on every validator or orchestrator spawn it makes).
-
-| Model tier | Dry-run usage |
-|------------|---------------|
-| Fable / Mythos (`claude-fable-*`, `claude-mythos-*`) | FORBIDDEN — never a validator, never the dry-run orchestrator, never inherited into either |
-| Sonnet (latest) | DEFAULT tier for any Claude-side dry-run work (orchestration, or user-approved provider-scope widening) |
-| Opus (latest) | Allowed ONLY when the user explicitly requests it for this dry-run |
+**Model allowlist (HARD): validators MUST use exact IDs from the table below.** Do NOT substitute a model from another provider or an older revision.
 
 | Lane (ALL on `opencode-go/*`) | Required |
 |------|---------------------|
-| Cost-efficient | ≥3 distinct small/fast families: Kimi, Deepseek-flash, GLM, MiniMax, Qwen-plus, Mimo |
-| Higher-capability | ≥1 of `qwen3.7`, `minimax-m3`, `deepseek-v4-pro` |
+| Cost-efficient | ≥3 distinct families from `gpt-5.6-luna`, `deepseek-v4-flash`, `glm-5.2`, `mimo-v2.5`, `qwen3.7-plus` |
+| Higher-capability | ≥1 of `qwen3.8-max`, `kimi-k3`, `minimax-m3`, `deepseek-v4-pro`, `mimo-v2.5-pro` |
 
 Each validator is one `opencode run`. Write the black-box prompt (improved SKILL.md + scenario + signal schema, NO answer keys) to a temp file once, then:
 
@@ -408,7 +402,7 @@ MUST record the five signals as structured flags so the finalize gate can verify
 | `--signal-tool-call-exact` | `pass` if every step used the named tool, else `fail` |
 | `--signal-verify` | `pass` if every VERIFY gate produced a signal, else `fail` |
 | `--signal-escape` | `pass` if a fallback rerouted correctly, `fail` if a triggered fallback failed, `na` if no fallback was triggered |
-| `--signal-model-lanes` | `pass` if BOTH lanes ran black-box on `opencode-go/*` — cost-efficient (≥3 distinct small/fast families) AND higher-capability (≥1 of qwen3.7-max / minimax-m3 / deepseek-v4-pro) — else `fail` |
+| `--signal-model-lanes` | `pass` if BOTH lanes ran black-box on `opencode-go/*` — cost-efficient (≥3 distinct families from `gpt-5.6-luna`, `deepseek-v4-flash`, `glm-5.2`, `mimo-v2.5`, `qwen3.7-plus`) AND higher-capability (≥1 of `qwen3.8-max`, `kimi-k3`, `minimax-m3`, `deepseek-v4-pro`, `mimo-v2.5-pro`) — else `fail` |
 
 ```bash
 python3 {SKILL_PROMPTER_DIR}/scripts/tracker.py record --skill "{SKILL_NAME}" \
@@ -505,7 +499,7 @@ python3 {SKILL_PROMPTER_DIR}/scripts/tracker.py finalize --skill "{SKILL_NAME}" 
 - **MUST NOT** use few-shot examples that leak test answers
 - **MUST NOT** change the skill's core purpose without user confirmation
 - **MUST NOT** claim a skill is "dryrun verified" without actually executing Phase 8
-- **MUST NOT** run any part of a dry-run on a Fable/Mythos-class model (`claude-fable-*`, `claude-mythos-*`) — Claude-side dry-run work defaults to Sonnet; Opus only on explicit user request (Phase 8.2 model-tier scope)
+- **MUST NOT** run any part of a dry-run outside the exact `opencode-go/*` allowlist in Phase 8.2
 - **MUST NOT** bypass the finalize gate with `--force` unless subagent execution is genuinely unavailable AND the reason is documented in `--summary`
 - **MUST** preserve all existing functionality while improving wording
 - **MUST** use `scripts/tracker.py` for ALL state tracking (no manual JSON editing)
