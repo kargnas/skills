@@ -763,19 +763,19 @@ Every skill creation, modification, merge, or split MUST end with a dry-run veri
 
    | SKILL.md size | Required validators |
    |---------------|---------------------|
-   | ≤ 30 lines | Two cost-efficient validators from different families (e.g. one Sonnet-family + one GLM-family). No frontier lane. |
+   | ≤ 30 lines | Two cost-efficient validators from different families in the exact allowlist below. No higher-capability lane. |
    | > 30 lines | Both lanes below, in full. |
 
    For skills over 30 lines, MUST run the same black-box scenario through both validation lanes:
 
    | Lane | Required validators |
    |------|---------------------|
-   | Cost-efficient | One Sonnet-family validator, one Kimi-family validator, one GPT-mini(or nano)-family validator, one Deepseek-flash-family validator and one GLM-family validator available in the active runner. (Use `opencode-go` provider with OpenCode CLI) |
-   | Frontier | At least one high-cost frontier validator available in the active runner — NEVER a Fable/Mythos-class model (see the validator model policy below). Opus qualifies for this lane ONLY when the user explicitly requests it; otherwise pick a non-Anthropic frontier family. |
+   | Cost-efficient | Run all five exact models: `opencode-go/gpt-5.6-luna`, `opencode-go/glm-5.2`, `opencode-go/mimo-v2.5`, `opencode-go/minimax-m3`, `opencode-go/qwen3.7-plus` |
+   | Higher-capability | Run at least one exact model: `opencode-go/qwen3.8-max`, `opencode-go/kimi-k3`, `opencode-go/grok-4.5`, or `opencode-go/mimo-v2.5-pro` |
 
-   **Validator model policy (HARD): Fable/Mythos-class models (`claude-fable-*`, `claude-mythos-*`) are FORBIDDEN for dry-run.** "High-cost frontier" MUST NOT be read as "most expensive model available": dry-run fans out across many validators, so the validator model's per-token price multiplies with no added verification value. The ban covers every route — explicit model flags, harness subagent delegation, and model inheritance (a Fable-class parent session MUST pass an explicit non-Fable model on every validator or orchestrator spawn). The Claude-family default for dry-run work is Sonnet (latest); Opus MAY be used ONLY on the user's explicit request.
+   **Validator model policy (HARD): every validator MUST use an exact `opencode-go/*` ID from the allowlist above.** Do NOT substitute another provider or an older revision.
 
-   If a model family required by the skill's size tier is unavailable, run every available validator and write `DRYRUN_PENDING.md` with the missing family. The dry-run is not PASS until every lane required by that tier runs or the user explicitly accepts the gap.
+   If a model required by the skill's size tier is unavailable, run every available validator and write `DRYRUN_PENDING.md` with the missing model ID. The dry-run is not PASS until every lane required by that tier runs or the user explicitly accepts the gap.
 
 3. **Verify these signals during the simulated run:**
 
@@ -787,7 +787,7 @@ Every skill creation, modification, merge, or split MUST end with a dry-run veri
    | Outputs | The simulator produces an artifact in the documented final shape |
    | No silent skips | No step is bypassed without an explicit, documented reason |
    | No answer leakage | Validator prompts contain no few-shot hints, expected outputs, weak-point notes, or pass/fail explanations |
-   | Model coverage | Every validator required by the skill's size tier ran the same black-box scenario (≤30 lines: two cost-efficient families; >30 lines: Sonnet, Kimi, GPT-mini, Deepseek-flash, GLM, and frontier); ZERO validators ran on a Fable/Mythos-class model |
+   | Model coverage | Every validator required by the skill's size tier ran the same black-box scenario (≤30 lines: two distinct cost-efficient allowlist families; >30 lines: all five cost-efficient models and at least one higher-capability model); ZERO validators ran outside the exact `opencode-go/*` allowlist |
 
 4. **For merged skills:** verify that every use case from each original skill still works. Run one scenario per original skill against the merged skill — every original use case MUST pass.
 
