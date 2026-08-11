@@ -308,7 +308,7 @@ python3 {SKILL_PROMPTER_DIR}/scripts/tracker.py record --skill "{SKILL_NAME}" \
 
 ### Phase 7: Self-Audit (Static)
 
-**Action**: Re-read the improved SKILL.md as if you are a cost-efficient validator (`gpt-5.6-luna`, `mimo-v2.5`, or `glm-5.2` through the `opencode-go` provider with OpenCode CLI). This phase is a STATIC text review — Phase 8 will dynamically execute the skill.
+**Action**: Re-read the improved SKILL.md as if you are a cost-efficient validator (`gpt-5.6-luna`, `deepseek-v4-flash`, or `glm-5.2` through the `opencode-go` provider with OpenCode CLI). This phase is a STATIC text review — Phase 8 will dynamically execute the skill.
 
 For EACH step, ask:
 1. Can I execute this with ZERO prior context? (Must be YES)
@@ -353,8 +353,8 @@ Run the same black-box scenario across BOTH validation lanes:
 
 | Lane (ALL on `opencode-go/*`) | Required |
 |------|---------------------|
-| Cost-efficient | ≥3 distinct families from `gpt-5.6-luna`, `glm-5.2`, `mimo-v2.5`, `minimax-m3`, `qwen3.7-plus` |
-| Higher-capability | ≥1 of `qwen3.8-max`, `kimi-k3`, `grok-4.5`, `mimo-v2.5-pro` |
+| Cost-efficient | ≥3 distinct families from `gpt-5.6-luna`, `deepseek-v4-flash`, `glm-5.2`, `mimo-v2.5`, `qwen3.7-plus` |
+| Higher-capability | ≥1 of `qwen3.8-max`, `kimi-k3`, `minimax-m3`, `deepseek-v4-pro`, `mimo-v2.5-pro` |
 
 Each validator is one `opencode run`. Write the black-box prompt (improved SKILL.md + scenario + signal schema, NO answer keys) to a temp file once, then:
 
@@ -402,7 +402,7 @@ MUST record the five signals as structured flags so the finalize gate can verify
 | `--signal-tool-call-exact` | `pass` if every step used the named tool, else `fail` |
 | `--signal-verify` | `pass` if every VERIFY gate produced a signal, else `fail` |
 | `--signal-escape` | `pass` if a fallback rerouted correctly, `fail` if a triggered fallback failed, `na` if no fallback was triggered |
-| `--signal-model-lanes` | `pass` if BOTH lanes ran black-box on `opencode-go/*` — cost-efficient (≥3 distinct families from `gpt-5.6-luna`, `glm-5.2`, `mimo-v2.5`, `minimax-m3`, `qwen3.7-plus`) AND higher-capability (≥1 of `qwen3.8-max`, `kimi-k3`, `grok-4.5`, `mimo-v2.5-pro`) — else `fail` |
+| `--signal-model-lanes` | `pass` if BOTH lanes ran black-box on `opencode-go/*` — cost-efficient (≥3 distinct families from `gpt-5.6-luna`, `deepseek-v4-flash`, `glm-5.2`, `mimo-v2.5`, `qwen3.7-plus`) AND higher-capability (≥1 of `qwen3.8-max`, `kimi-k3`, `minimax-m3`, `deepseek-v4-pro`, `mimo-v2.5-pro`) — else `fail` |
 
 ```bash
 python3 {SKILL_PROMPTER_DIR}/scripts/tracker.py record --skill "{SKILL_NAME}" \
