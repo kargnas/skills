@@ -5,6 +5,12 @@ description: Scaffolds one-click VS Code/Cursor debug, run, tasks, and settings 
 
 # Make this project VSCode-Ready
 
+## Activation
+
+Manual-first skill. Run it only when the user asks to set up VS Code/Cursor configs for the project (e.g. "make this project VSCode-ready", "vscode launch 세팅해줘", "디버그 설정 만들어줘"). If the conversation merely hints at it, at most mention that this skill could help and ask whether to use it; do not start on your own.
+
+Before starting, briefly say in one line that this skill is being used.
+
 Act as a Principal Software Architect and Tooling Expert. Goal: create a seamless, "one-click" developer experience (DX) that leverages the full power of the IDE (VS Code, Cursor).
 
 # Objective

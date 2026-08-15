@@ -5,6 +5,12 @@ description: "Runs a cross-language cleanup for writing tells shared by large fr
 
 # Humanizer: Kill GPT Tells
 
+## Activation
+
+Manual-first skill. Run it only when the user asks to remove AI tells from text (e.g. "AI 티 안나게 해줘", "GPT 티 지워줘", "de-GPT this"). If the conversation merely involves prose that looks AI-written, at most mention that this skill could help and ask whether to use it; do not start on your own.
+
+Before starting, briefly say in one line that this skill is being used.
+
 Remove recurring AI-writing fingerprints from English and Korean text. Despite the skill name, these patterns are not unique to GPT: large frontier language models commonly converge on the same over-complete, over-explained, overly balanced, and translation-shaped prose. The catalog keeps “GPT tell” as a familiar shorthand.
 
 Some users call this style `자폐 말투`. Treat that phrase only as colloquial request vocabulary for rigid or socially miscalibrated model prose. MUST NOT equate the writing patterns with autism or use the phrase to characterize autistic people.

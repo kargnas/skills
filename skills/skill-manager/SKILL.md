@@ -8,6 +8,12 @@ license: Complete terms in LICENSE.txt
 
 This skill provides guidance for the full lifecycle of skill structure — creating new skills, modifying skill structure, merging related skills together, splitting overgrown skills into focused ones, and refactoring directory and file layout.
 
+## Activation
+
+Manual-first skill. Run it only when the user explicitly asks to create, edit, merge, split, or clean up a skill (e.g. "스킬 만들어줘", "make a skill for X") — and even then, confirm the plan with the user before executing. If the conversation merely touches on skill work without such a request, at most mention that this skill could help and ask whether to use it; do not start on your own.
+
+Before starting, briefly say in one line that this skill is being used.
+
 ## Scope and Boundaries
 
 Two skills cover the skill lifecycle. Use the right one — they are not interchangeable.
