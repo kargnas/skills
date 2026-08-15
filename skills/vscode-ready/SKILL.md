@@ -1,13 +1,11 @@
 ---
 name: vscode-ready
-description: Scaffolds one-click VS Code/Cursor debug, run, tasks, and settings configs from the codebase stack. Triggers on make project VSCode-ready, /vscode-ready.
+description: Use only when the user asks to set up VS Code/Cursor launch, debug, run, or tasks configs (e.g. "make this project VSCode-ready"). Do not run on your own.
 ---
 
 # Make this project VSCode-Ready
 
-## Activation
-
-Manual-first. Run only when the user asks to set up VS Code/Cursor launch, debug, or tasks configs. Otherwise, at most suggest this skill and ask. Mention in one line that this skill is being used.
+When starting, let the user know in one line that this skill is being used.
 
 Act as a Principal Software Architect and Tooling Expert. Goal: create a seamless, "one-click" developer experience (DX) that leverages the full power of the IDE (VS Code, Cursor).
 

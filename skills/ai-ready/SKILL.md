@@ -1,13 +1,11 @@
 ---
 name: ai-ready
-description: Transform the current project into an AI-ready codebase by migrating to AGENTS.md, setting up debugging/testing infrastructure, and creating comprehensive documentation
+description: Use only when the user asks to make the repo AI-ready or AI-optimized (AGENTS.md migration, debugging/testing setup, docs). Do not run on your own.
 ---
 
 # Make this project AI-ready
 
-## Activation
-
-Manual-first. Run only when the user asks to make the repo AI-ready or AI-optimized. Otherwise, at most suggest this skill and ask. Mention in one line that this skill is being used.
+When starting, let the user know in one line that this skill is being used.
 
 Goal: Enhance outdated AI Rule file and the codebase in this project to up-to-date AI Rule file and AI-ready easy setting with up-to-date codebase understanding.
 

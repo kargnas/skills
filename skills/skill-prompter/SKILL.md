@@ -1,6 +1,6 @@
 ---
 name: skill-prompter
-description: "Prompting compliance specialist for AI agent skills — rewrites SKILL.md steps with RFC 2119 wording, explicit tools, VERIFY gates, and dry-run checks; also owns skill name + frontmatter description wording (trigger-surface rules). Use when skill steps get skipped, prompts need compliance hardening, or a skill needs naming or its description written/reviewed. Structural lifecycle work goes to skill-manager."
+description: "Prompting compliance specialist for AI agent skills — rewrites SKILL.md steps with RFC 2119 wording, explicit tools, VERIFY gates, and dry-run checks; also owns skill name + frontmatter description wording (trigger-surface rules). Use only when the user asks to improve or harden a skill's prompts/steps or to name/review a skill description, and confirm with the user before running. Structural lifecycle work goes to skill-manager."
 ---
 
 # Skill Prompter
@@ -9,9 +9,7 @@ description: "Prompting compliance specialist for AI agent skills — rewrites S
 
 ---
 
-## Activation
-
-Manual-first. Run only when the user explicitly asks to improve or reword a skill's prompts, steps, name, or description, and confirm the plan first. Otherwise, at most suggest this skill and ask. Mention in one line that this skill is being used.
+When starting, let the user know in one line that this skill is being used.
 
 ---
 

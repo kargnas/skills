@@ -1,13 +1,11 @@
 ---
 name: humanizer-kill-gpt
-description: "Runs a cross-language cleanup for writing tells shared by large frontier LLMs, not only GPT: English source constructs that survive Korean translation and Korean-surface translationese. Triggers on de-GPT, GPT 티, AI 티, 번역체 GPT, 자폐 말투 (colloquial shorthand for rigid or over-complete model prose, not a claim about autism), or English text bound for Korean; broad Korean punctuation and spacing cleanup stays out of scope."
+description: "Runs a cross-language cleanup for writing tells shared by large frontier LLMs, not only GPT: English source constructs that survive Korean translation and Korean-surface translationese. Use only when the user asks to remove AI/GPT tells from text (de-GPT, GPT 티, AI 티, 번역체 GPT, 자폐 말투 — colloquial shorthand for rigid or over-complete model prose, not a claim about autism). Do not run on your own; broad Korean punctuation and spacing cleanup stays out of scope."
 ---
 
 # Humanizer: Kill GPT Tells
 
-## Activation
-
-Manual-first. Run only when the user asks to remove AI tells from text. Otherwise, at most suggest this skill and ask. Mention in one line that this skill is being used.
+When starting, let the user know in one line that this skill is being used.
 
 Remove recurring AI-writing fingerprints from English and Korean text. Despite the skill name, these patterns are not unique to GPT: large frontier language models commonly converge on the same over-complete, over-explained, overly balanced, and translation-shaped prose. The catalog keeps “GPT tell” as a familiar shorthand.
 
