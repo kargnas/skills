@@ -10,9 +10,7 @@ This skill provides guidance for the full lifecycle of skill structure — creat
 
 ## Activation
 
-Manual-first skill. Run it only when the user explicitly asks to create, edit, merge, split, or clean up a skill (e.g. "스킬 만들어줘", "make a skill for X") — and even then, confirm the plan with the user before executing. If the conversation merely touches on skill work without such a request, at most mention that this skill could help and ask whether to use it; do not start on your own.
-
-Before starting, briefly say in one line that this skill is being used.
+Manual-first. Run only when the user explicitly asks to create, edit, merge, split, or clean up a skill, and confirm the plan first. Otherwise, at most suggest this skill and ask. Mention in one line that this skill is being used.
 
 ## Scope and Boundaries
 

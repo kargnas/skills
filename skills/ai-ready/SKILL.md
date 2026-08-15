@@ -7,9 +7,7 @@ description: Transform the current project into an AI-ready codebase by migratin
 
 ## Activation
 
-Manual-first skill. Run it only when the user asks to make the repo AI-ready or AI-optimized (e.g. "이 레포 AI 최적화해줘", "make this project AI-ready", "AGENTS.md 세팅해줘"). If the conversation merely hints at it, at most mention that this skill could help and ask whether to use it; do not start on your own.
-
-Before starting, briefly say in one line that this skill is being used.
+Manual-first. Run only when the user asks to make the repo AI-ready or AI-optimized. Otherwise, at most suggest this skill and ask. Mention in one line that this skill is being used.
 
 Goal: Enhance outdated AI Rule file and the codebase in this project to up-to-date AI Rule file and AI-ready easy setting with up-to-date codebase understanding.
 

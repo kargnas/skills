@@ -11,9 +11,7 @@ description: "Prompting compliance specialist for AI agent skills — rewrites S
 
 ## Activation
 
-Manual-first skill. Run it only when the user explicitly asks to improve, harden, or reword a skill's prompts, steps, name, or description — and even then, confirm the plan with the user before executing. If the conversation merely hints at skill-quality issues without such a request, at most mention that this skill could help and ask whether to use it; do not start on your own.
-
-Before starting, briefly say in one line that this skill is being used.
+Manual-first. Run only when the user explicitly asks to improve or reword a skill's prompts, steps, name, or description, and confirm the plan first. Otherwise, at most suggest this skill and ask. Mention in one line that this skill is being used.
 
 ---
 

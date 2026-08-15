@@ -7,9 +7,7 @@ description: "Runs a cross-language cleanup for writing tells shared by large fr
 
 ## Activation
 
-Manual-first skill. Run it only when the user asks to remove AI tells from text (e.g. "AI 티 안나게 해줘", "GPT 티 지워줘", "de-GPT this"). If the conversation merely involves prose that looks AI-written, at most mention that this skill could help and ask whether to use it; do not start on your own.
-
-Before starting, briefly say in one line that this skill is being used.
+Manual-first. Run only when the user asks to remove AI tells from text. Otherwise, at most suggest this skill and ask. Mention in one line that this skill is being used.
 
 Remove recurring AI-writing fingerprints from English and Korean text. Despite the skill name, these patterns are not unique to GPT: large frontier language models commonly converge on the same over-complete, over-explained, overly balanced, and translation-shaped prose. The catalog keeps “GPT tell” as a familiar shorthand.
 
