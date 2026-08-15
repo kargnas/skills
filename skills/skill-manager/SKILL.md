@@ -1,7 +1,6 @@
 ---
 name: skill-manager
-description: Skill structure and lifecycle manager — creates, edits, merges, splits, and sanitizes skills (model-reference checks against models.dev). Use only when the user asks to create, edit, merge, split, or clean up a skill, and confirm with the user before running. Step wording and name/description wording go to skill-prompter.
-license: Complete terms in LICENSE.txt
+description: Skill structure and lifecycle manager — creates, merge a several skills into one to save wasting of tokens from a lot of skills' descriptions. Confirm with the user before running if they want to run this skill with a brief explanation what this skill will do for them.
 ---
 
 # Skill Manager

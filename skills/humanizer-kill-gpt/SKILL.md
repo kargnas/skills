@@ -1,6 +1,6 @@
 ---
 name: humanizer-kill-gpt
-description: "Runs a cross-language cleanup for writing tells shared by large frontier LLMs, not only GPT: English source constructs that survive Korean translation and Korean-surface translationese. Use only when the user asks to remove AI/GPT tells from text (de-GPT, GPT 티, AI 티, 번역체 GPT, 자폐 말투 — colloquial shorthand for rigid or over-complete model prose, not a claim about autism). Do not run on your own; broad Korean punctuation and spacing cleanup stays out of scope."
+description: "Runs a cross-language cleanup for writing tells shared by large frontier LLMs, not only GPT: English source constructs that survive other language translation and language-surface translationese. Use only when the user asks to remove AI/GPT tells from text (de-GPT, GPT 티, AI 티, 번역체 GPT, 자폐 말투 — colloquial shorthand for rigid or over-complete model prose, not a claim about autism)."
 ---
 
 # Humanizer: Kill GPT Tells
