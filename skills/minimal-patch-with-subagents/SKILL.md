@@ -49,7 +49,7 @@ The budget is measured by **logic files in `git status`** (primary) and **effect
 
 > Docs-only `.md` files (AGENTS.md context update, debate log, README note) don't count toward the file budget — only files with runtime-behavior changes do.
 
-> **주석과 `.md` 문서 수정은 음(−)의 가중치를 가진다 — 많을수록 점수가 깎인다.** 주석/`.md` 라인은 30% 비율로 effective_lines에서 차감된다 (`effective = logic − 0.3 × (comments + md)`, 최소 0). 예: 로직 10줄 + 주석·문서 30줄 = 실효 1줄 패치. 미니멀 패치일수록 "왜 이렇게 고쳤는지", "원래 어떤 버그였는지", "나중에 어떻게 개선할 수 있는지"를 주석과 AGENTS.md / README에 풍부히 남겨야 한다. 주석·문서 없는 미니멀 패치는 시한폭탄이다. 단 30% 상한이 있으므로 문서 폭탄으로 진짜 로직 리스크를 가릴 수는 없다. 그리고 이 보너스는 "이 패치 맥락 설명"용 문서에만 적용 — 기능 문서 신규 작성, 무관한 문서 리팩토링은 분장한 scope creep이다.
+> **Comments and `.md` doc edits carry NEGATIVE weight — the more you add, the lower (better) the score.** Comment/`.md` lines are discounted from `effective_lines` at 30% (`effective = logic − 0.3 × (comments + md)`, floor 0). Example: 10 logic lines + 30 comment/doc lines = an effective 1-line patch. The more minimal the patch, the more richly you MUST record "why it was fixed this way", "what the original bug was", and "how it could be improved later" in comments and AGENTS.md / README. A minimal patch with no comments or docs is a time bomb. But the 30% cap means a doc dump can never hide real logic risk. And this bonus applies ONLY to docs that explain *this* patch's context — writing new feature docs or doing unrelated doc refactors is scope creep in disguise.
 
 If the change exceeds "Acceptable" in **effective lines**, STOP and ask the user before proceeding.
 
@@ -233,7 +233,7 @@ OUTPUT (must be valid markdown, exactly these fields):
 - Winner: {consensus_winner}   (votes: {tally})
 - Rationale: {consensus_rationale}
 - Expected `git status`: {logic_file_count} logic file(s) + {md_file_count} docs file(s)
-- Expected effective lines: ~{E}   (= logic {L} − 0.3 × (주석 {C} + md {D}))
+- Expected effective lines: ~{E}   (= logic {L} − 0.3 × (comments {C} + md {D}))
 - Risk notes: {top 1-2 minority concerns, or "none"}
 ```
 
@@ -331,7 +331,7 @@ After revert, MUST return to [S11] and re-apply more carefully.
 - Insertions: +{ins}
 - Deletions: −{del}
 - Comment lines added: {C}
-- Effective lines: ~{E}   (= logic {L} − 0.3 × (주석 {C} + md {D}))
+- Effective lines: ~{E}   (= logic {L} − 0.3 × (comments {C} + md {D}))
 {raw git diff --stat output}
 ```
 
@@ -402,7 +402,7 @@ Log MUST follow this template:
 - {follow-up if temporary}
 ```
 
-> 이 로그는 같은 버그가 재발했을 때 "이전에 어떤 논의를 거쳐 이 결정을 했는지" 추적하는 감사 기록이다.
+> This log is an audit record: when the same bug recurs, it traces "what discussion led to this decision last time."
 
 **VERIFY**: The log file exists at the expected path. `git log` is NOT touched (the log is local audit-only, never staged). File size > 200 bytes.
 
