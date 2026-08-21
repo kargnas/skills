@@ -71,6 +71,14 @@ Git trailer로 커밋의 결정 배경을 기록하고 조회하며, 프로젝�
 npx -y skills add kargnas/skills --skill git-lore
 ```
 
+### `minimal-patch-with-subagents`
+
+버그 수정 위치를 병렬 서브에이전트들이 독립적으로 토론·투표해, 편집 전에 가장 위험이 낮은 최소 패치를 선택합니다.
+
+```bash
+npx -y skills add kargnas/skills --skill minimal-patch-with-subagents
+```
+
 ## Claude Code 플러그인으로 설치
 
 Claude Code에서는 이 저장소를 플러그인 마켓플레이스로 추가할 수도 있습니다.
@@ -93,6 +101,7 @@ Claude Code에서는 이 저장소를 플러그인 마켓플레이스로 추가�
 | [`skill-prompter`](skills/skill-prompter/) | 스킬 지시문의 실행 준수율과 트리거 문구 개선 |
 | [`humanizer-kill-gpt`](skills/humanizer-kill-gpt/) | 영어·한국어 글의 GPT·LLM 문체 흔적 제거 |
 | [`git-lore`](skills/git-lore/) | Captures, queries, and configures decision context in native Git trailers |
+| [`minimal-patch-with-subagents`](skills/minimal-patch-with-subagents/) | 병렬 서브에이전트 토론으로 확정된 버그의 최소·최저위험 패치 선택 |
 
 ## 라이선스
 
