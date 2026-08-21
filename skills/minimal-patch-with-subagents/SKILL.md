@@ -1,6 +1,6 @@
 ---
 name: minimal-patch-with-subagents
-description: Minimal patching workflow that debates fix options across parallel independent subagents and applies the smallest safe diff. Use for the smallest safe fix to a confirmed bug when you want multiple reviewers to converge on the least-risky patch location before editing.
+description: Minimal patching workflow that debates fix options across parallel independent subagents and applies the smallest safe diff. Use only when you want risk-free code, and to code real minimal that only needs to fix the issue.
 ---
 
 # Minimal Patch with Subagents
