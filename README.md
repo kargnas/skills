@@ -88,7 +88,19 @@ Claude Code에서는 이 저장소를 플러그인 마켓플레이스로 추가�
 ```
 
 ```text
-/plugin install kargnas-skills@kargnas/skills
+/plugin install kargnas-skills@kargnas-plugins
+```
+
+## Codex 플러그인으로 설치
+
+Codex CLI 0.146.0 이상이 필요합니다. Codex는 `.agents/plugins/marketplace.json`을 먼저 읽으며, 이 파일은 `npm run version:sync`가 `.claude-plugin/` 매니페스트에서 자동 생성합니다.
+
+```bash
+codex plugin marketplace add kargnas/skills
+```
+
+```bash
+codex plugin add kargnas-skills@kargnas-plugins
 ```
 
 ## 스킬 목록

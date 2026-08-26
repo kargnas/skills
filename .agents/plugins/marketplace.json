@@ -1,0 +1,18 @@
+{
+  "name": "kargnas-plugins",
+  "interface": {
+    "displayName": "Kargnas Skills"
+  },
+  "plugins": [
+    {
+      "name": "kargnas-skills",
+      "source": "./",
+      "description": "Kargnas' agent skills — AI-ready project setup, VS Code scaffolding, skill authoring/hardening tools, GPT-tell removal, Git-trailer decision context, and idea-to-global-standard ideation",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "development"
+    }
+  ]
+}

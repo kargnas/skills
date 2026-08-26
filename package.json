@@ -1,0 +1,9 @@
+{
+  "name": "kargnas-skills",
+  "private": true,
+  "scripts": {
+    "test": "node --test scripts/*.test.mjs",
+    "version:sync": "node scripts/sync-plugin-version.mjs",
+    "version:check": "node scripts/sync-plugin-version.mjs --check"
+  }
+}
