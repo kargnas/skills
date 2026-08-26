@@ -102,6 +102,7 @@ Claude Code에서는 이 저장소를 플러그인 마켓플레이스로 추가�
 | [`humanizer-kill-gpt`](skills/humanizer-kill-gpt/) | 영어·한국어 글의 GPT·LLM 문체 흔적 제거 |
 | [`git-lore`](skills/git-lore/) | Captures, queries, and configures decision context in native Git trailers |
 | [`minimal-patch-with-subagents`](skills/minimal-patch-with-subagents/) | 병렬 서브에이전트 토론으로 확정된 버그의 최소·최저위험 패치 선택 |
+| [`dont-trust-my-idea`](skills/dont-trust-my-idea/) | Transforms a broad/non-standard idea into a global-standard idea with an eight-concept preview |
 
 ## 라이선스
 
