@@ -79,6 +79,14 @@ npx -y skills add kargnas/skills --skill git-lore
 npx -y skills add kargnas/skills --skill minimal-patch-with-subagents
 ```
 
+### `dont-trust-my-idea`
+
+넓거나 한국 표준에 치우친 기능 아이디어를 8가지 컨셉 프리뷰로 확장해, 글로벌 표준 아이디어로 다듬습니다. 8번째 컨셉은 조건을 전혀 모르는 클린 컨텍스트 서브에이전트가 처음부터 다시 상상합니다.
+
+```bash
+npx -y skills add kargnas/skills --skill dont-trust-my-idea
+```
+
 ## Claude Code 플러그인으로 설치
 
 Claude Code에서는 이 저장소를 플러그인 마켓플레이스로 추가할 수도 있습니다.
