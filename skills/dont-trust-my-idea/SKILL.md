@@ -3,7 +3,7 @@ name: dont-trust-my-idea
 description: "A skill for transforming a broad/non-standard/Korean-standard idea/plan into a global-standard idea for OP.GG services."
 ---
 
-I am making a new feature for our services (OP.GG) - I have an extremely broad idea for the feature but it could be a bad idea for a global audience of our service.
+I am making a new feature for our services (OP.GG) - I have an extremely broad idea for the feature but it could be a bad idea for a global audience of our service. Use `brainstorming` skill together when you use this kill.
 
 ### UI Ideation
 
