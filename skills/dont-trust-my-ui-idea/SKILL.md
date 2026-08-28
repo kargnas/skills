@@ -44,7 +44,7 @@ For examples:
 
 ## The `Don't Trust My Idea` concept
 
-This is the most important concept of this skill. The one concept must be produced by a clean-context subagent that never sees the user's conditions, feature list, or implementation choices. Because the user somtimes can't think outside of the plan, no need a super fresh eyes.
+This is the most important concept of this skill. The one concept must be produced by a clean-context subagent that never sees the user's conditions, feature list, or implementation choices. Because the user sometimes can't think outside of the plan, so need a super fresh eyes.
 
 You send the subagent ONE goal sentence and nothing else.
 
