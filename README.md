@@ -79,12 +79,12 @@ npx -y skills add kargnas/skills --skill git-lore
 npx -y skills add kargnas/skills --skill minimal-patch-with-subagents
 ```
 
-### `dont-trust-my-idea`
+### `dont-trust-my-ui-idea`
 
 넓거나 한국 표준에 치우친 기능 아이디어를 8가지 컨셉 프리뷰로 확장해, 글로벌 표준 아이디어로 다듬습니다. 8번째 컨셉은 조건을 전혀 모르는 클린 컨텍스트 서브에이전트가 처음부터 다시 상상합니다.
 
 ```bash
-npx -y skills add kargnas/skills --skill dont-trust-my-idea
+npx -y skills add kargnas/skills --skill dont-trust-my-ui-idea
 ```
 
 ## Claude Code 플러그인으로 설치
@@ -122,7 +122,7 @@ codex plugin add kargnas-skills@kargnas-plugins
 | [`humanizer-kill-gpt`](skills/humanizer-kill-gpt/) | 영어·한국어 글의 GPT·LLM 문체 흔적 제거 |
 | [`git-lore`](skills/git-lore/) | Captures, queries, and configures decision context in native Git trailers |
 | [`minimal-patch-with-subagents`](skills/minimal-patch-with-subagents/) | 병렬 서브에이전트 토론으로 확정된 버그의 최소·최저위험 패치 선택 |
-| [`dont-trust-my-idea`](skills/dont-trust-my-idea/) | Transforms a broad/non-standard idea into a global-standard idea with an eight-concept preview |
+| [`dont-trust-my-ui-idea`](skills/dont-trust-my-ui-idea/) | Transforms a broad/non-standard idea into a global-standard idea with an eight-concept preview |
 
 ## 라이선스
 
