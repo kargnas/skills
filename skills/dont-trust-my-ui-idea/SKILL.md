@@ -25,6 +25,7 @@ Our repository is usually old with a lot of existing source code and years of hi
     6. The standard approach Korean developers or designers would use (but it doesn't mean the characters should be in Korean)
     7. The standard approach Chinese developers or designers would use (but it doesn't mean the characters should be in Chinese)
     8. Imagine extremely differently -- this is specified in the bottom section `## The Don't Trust My Idea` concept.
+3. Once the user choose any options, go ahead every sub-steps until finished the development without asking to the user. (For example, don't ask for approval at plan, audit, or verification.)
 
 ## Working on the `brainstorming` skill
 
