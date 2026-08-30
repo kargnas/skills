@@ -72,3 +72,6 @@ Calibration examples:
 
 ## References
 - Official repository of `superpowers` skills: https://github.com/obra/superpowers
+
+## NEVER do for design
+- NEVER suggest Metric Card, Stat Card, or KPI Card design. That's a useless & AI smell design.
