@@ -1,9 +1,9 @@
 ---
 name: dont-trust-my-ui-idea
-description: "A skill for transforming a broad/non-standard/Korean-standard idea/plan into a global-standard idea for OP.GG services. You must use `superpowers:brainstorming` or `brainstorming` skill together when using this skill."
+description: "A skill for transforming a broad/non-standard/Korean-standard idea/plan into a global-standard idea for OP.GG services. Renders eight UI concepts in a browser preview and builds the one the user picks."
 ---
 
-Goal: Create multiple UI design concepts using the Visual Companion feature of `brainstorming` skill, and I choose one from the generated concepts.
+Goal: Create eight UI design concepts in a browser preview, let the user pick one, then build it.
 
 ## Context
 
@@ -13,35 +13,21 @@ Our repository is usually old with a lot of existing source code and years of hi
 
 ## Steps
 
-1. Use `superpowers:brainstorming` or `brainstorming` skill. Ask to install if it's not installed.
-2. Create multiple concepts of UI mockups with Visual Companion in `brainstorming` skill.
-  1. Using `dont-trust-my-ui-idea` means wanting to create the Visual Companion without any additional approval of `token-intensive`. Don't ask additional approval to avoid unnecessary interruptions.
-  2. Propose eight approaches (override this default if the user wants to create only a specific number of approaches):
-    1. Your own recommendation
-    2. The approach a market leader would most commonly use
-    3. The standard approach global developers would use
-    4. An unusual approach that departs from common patterns
-    5. A devil's advocate approach
-    6. The standard approach Korean developers or designers would use (but it doesn't mean the characters should be in Korean)
-    7. The standard approach Chinese developers or designers would use (but it doesn't mean the characters should be in Chinese)
-    8. Imagine extremely differently -- this is specified in the bottom section `## The Don't Trust My Idea` concept.
-3. Once the user choose any options, go ahead every sub-steps until finished the development without asking to the user. (For example, don't ask for approval at plan, audit, or verification.)
-
-## Working on the `brainstorming` skill
-
-The skill has many guardrails to get approval from the user, but `dont-trust-my-ui-idea` is specifically designed for using Visual Companion feature of it, so you don't need to get approval for using that feature.
-
-Two of its steps are explicitly overridden while this skill is active:
-
-- Skip the just-in-time Visual Companion offer (the "own message + wait for the user's response" rule). Invoking `dont-trust-my-ui-idea` is the acceptance, so start the Visual Companion directly.
-- The eight approaches in this skill replace `brainstorming`'s "Propose 2-3 approaches" step.
-
-For examples:
-- Prefer an HTML preview over ASCII and treat the visual preview as approved for creation.
-- I know Visual Companion is token-intensive, and I approve it once I use `dont-trust-my-ui-idea`. So, never ask me like:
-  - "It's better to see in your eyes in this case." -> I ALWAYS PREFER VISUAL PREVIEW in `dont-trust-my-ui-idea`
-  - "Are you fine with heavy token usage?" -> YES
-  - "This is a new feature, so I need to ask ..." -> I LOVE THIS NEW FEATURES
+1. **Explore project context.** Read the files, docs, and recent commits around the surface being changed so the concepts fit the existing flow.
+2. **Clarify only if the capability itself is ambiguous.** One question per message, multiple choice when possible. Do not ask about scope, token cost, or whether to open the preview.
+3. **Dispatch the clean-context subagent** for concept 8 (see `## The Don't Trust My Idea concept`) so it runs while you draft the other seven.
+4. **Start the browser preview** with `scripts/start-server.sh --project-dir <project root> --open` and follow `references/visual-companion.md`. Invoking this skill is the approval: never ask before opening it, never mention token cost, and prefer an HTML preview over ASCII.
+5. **Push all eight concepts on one screen** as a single-select card grid (override the count only if the user asks for a specific number):
+   1. Your own recommendation
+   2. The approach a market leader would most commonly use
+   3. The standard approach global developers would use
+   4. An unusual approach that departs from common patterns
+   5. A devil's advocate approach
+   6. The standard approach Korean developers or designers would use (but it doesn't mean the characters should be in Korean)
+   7. The standard approach Chinese developers or designers would use (but it doesn't mean the characters should be in Chinese)
+   8. Imagine extremely differently -- this is specified in the bottom section `## The Don't Trust My Idea` concept.
+6. **End your turn** with the URL and a one-line summary, and ask the user to click a concept and reply in the terminal.
+7. **Once the user chooses**, read the click events, push the waiting screen, and go ahead every sub-step until the development is finished without asking the user. (For example, don't ask for approval at plan, audit, or verification.)
 
 ## The `Don't Trust My Idea` concept
 
@@ -72,7 +58,9 @@ Calibration examples:
   - Right: `Let duo-finder users express whether they want voice chat when matching`
 
 ## References
-- Official repository of `superpowers` skills: https://github.com/obra/superpowers
+
+- Browser preview guide: `references/visual-companion.md`
+- Server scripts: `scripts/start-server.sh`, `scripts/stop-server.sh`
 
 ## NEVER do for design
 - NEVER suggest Metric Card, Stat Card, or KPI Card design. That's a useless & AI smell design.
