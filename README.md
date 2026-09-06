@@ -83,6 +83,10 @@ npx -y skills add kargnas/skills --skill minimal-patch-with-subagents
 
 넓거나 한국 표준에 치우친 기능 아이디어를 8가지 컨셉 프리뷰로 확장해, 글로벌 표준 아이디어로 다듬습니다. 8번째 컨셉은 조건을 전혀 모르는 클린 컨텍스트 서브에이전트가 처음부터 다시 상상합니다.
 
+내장된 로컬 서버가 8가지 컨셉을 브라우저 한 화면에 카드로 띄우고, 클릭한 컨셉을 기록합니다. 아래는 "챔피언 상세 페이지의 카운터 섹션에 티어 필터, 아이템 툴팁, 캐싱을 넣고 싶다"는 요청에서 나온 실제 화면입니다.
+
+![dont-trust-my-ui-idea가 띄운 8가지 컨셉 화면](docs/dont-trust-my-ui-idea-concepts.png)
+
 ```bash
 npx -y skills add kargnas/skills --skill dont-trust-my-ui-idea
 ```

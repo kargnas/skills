@@ -9,7 +9,7 @@
      *
      * This template provides a consistent frame with:
      * - OS-aware light/dark theming
-     * - Header connection status
+     * - Header branding and connection status
      * - Scrollable main content area
      * - CSS helpers for common UI patterns
      *
@@ -63,6 +63,8 @@
     }
 
     /* ===== FRAME STRUCTURE ===== */
+    .brand { justify-self: start; font-size: 0.75rem; font-weight: 600; letter-spacing: 0.02em; color: var(--text-secondary); line-height: 1; white-space: nowrap; }
+    .brand a { color: inherit; text-decoration: none; }
     .status { font-size: 0.7rem; color: var(--status-color, var(--success)); display: flex; align-items: center; gap: 0.4rem; justify-self: end; white-space: nowrap; line-height: 1; }
     .status::before { content: ''; width: 6px; height: 6px; background: var(--status-color, var(--success)); border-radius: 50%; }
 
@@ -191,6 +193,7 @@
 </head>
 <body>
   <div class="header">
+    <div class="brand"><a href="https://github.com/kargnas/skills/tree/main/skills/dont-trust-my-ui-idea">Don't Trust My Idea</a></div>
     <div class="status">Connecting…</div>
   </div>
 
