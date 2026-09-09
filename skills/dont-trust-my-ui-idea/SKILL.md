@@ -1,6 +1,6 @@
 ---
 name: dont-trust-my-ui-idea
-description: "A skill for transforming a broad/non-standard/Korean-standard idea/plan into a global-standard idea for OP.GG services. Renders eight UI concepts in a browser preview and builds the one the user picks."
+description: "Generates multiple UI design options, presents them to the user in a browser preview, and implements the option they choose."
 ---
 
 Goal: Create eight UI design concepts in a browser preview, let the user pick one, then build it.
