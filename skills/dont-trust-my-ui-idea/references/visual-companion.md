@@ -6,7 +6,7 @@ A local server that shows the eight UI concepts in the user's browser and record
 
 The server watches a directory for HTML files and serves the newest one to the browser. You write HTML to `screen_dir`; the user sees it and clicks to select. Selections are appended to `state_dir/events`, which you read on your next turn.
 
-**Content fragments vs full documents:** If your HTML file starts with `<!DOCTYPE` or `<html`, the server serves it as-is (plus the helper script). Otherwise it wraps your content in `scripts/frame-template.html`, which adds the theme CSS, connection status, and click handling. **Write content fragments by default.**
+**Content fragments vs full documents:** If your HTML file starts with `<!DOCTYPE` or `<html`, the server serves it as-is (plus the helper script). Otherwise it wraps your content in `scripts/frame-template.html`, which adds the theme CSS, connection status, and click handling. **Write content fragments by default.** Use a full document when the design needs complete control over the page.
 
 ## Starting a Session
 
@@ -57,7 +57,7 @@ scripts/start-server.sh --project-dir /path/to/project --host 0.0.0.0 --url-host
 
 3. **On your next turn**, read `$STATE_DIR/events` if it exists and merge it with the user's terminal text. The terminal message is primary; events give the click trail.
 
-4. **Iterate or advance.** If feedback changes the current screen, write a new versioned file. Move on only once a concept is chosen.
+4. **Iterate or advance.** If feedback changes the current screen, write a new versioned file. Show a more detailed view when needed to resolve the design question. Begin implementation once the user makes their final concept choice.
 
 5. **Unload when returning to the terminal.** Once a concept is chosen and you start implementing, push a waiting screen so the user is not staring at a resolved choice:
 
@@ -68,27 +68,34 @@ scripts/start-server.sh --project-dir /path/to/project --host 0.0.0.0 --url-host
    </div>
    ```
 
-## The Concept Screen
+## Presenting Concepts
 
-All eight concepts go on one screen as a single-select `.cards` grid. Each card carries `data-choice` with a short slug and shows a wireframe inside `.card-image`, with the concept name and a one-line rationale in `.card-body`.
+Choose the presentation that makes the design decision clear: cards for compact comparisons, side-by-side mockups for layouts, or full-size screens for detailed inspection. Prefer 2–4 alternatives per comparison and provide navigation across all eight concepts so the user can inspect and revisit them before choosing. Keep each concept's `data-choice` slug stable across views.
+
+For a card comparison, place the mockup inside `.card-image` and the concept name and rationale in `.card-body`:
 
 ```html
-<h2>Which direction should we build?</h2>
-<p class="subtitle">Click one. Each concept is a full alternative, not a variation.</p>
+<h2>Which layout makes matchup advice easier to scan?</h2>
+<p class="subtitle">Compare how each concept presents the opponent and recommended action.</p>
 
 <div class="cards">
   <div class="card" data-choice="recommended" onclick="toggleSelect(this)">
-    <div class="card-image"><!-- wireframe --></div>
+    <div class="card-image"><!-- mockup --></div>
     <div class="card-body">
       <h3>1. My recommendation</h3>
       <p>Why this fits OP.GG users</p>
     </div>
   </div>
-  <!-- cards 2..8 -->
+  <!-- other concepts in this comparison -->
 </div>
 ```
 
-Build the wireframes from the frame's mock elements and inline styles. Real content beats placeholder text when it exposes a layout problem.
+## Design Tips
+
+- **Scale fidelity to the question.** Use wireframes for layout and structure; use polished mockups for look and feel, with representative typography, spacing, colors, and assets.
+- **Explain the decision on each page.** Ask a specific visual question so the user knows what to compare.
+- **Use real content when it matters.** Representative text, data, and images reveal layout problems that placeholders obscure.
+- **Keep the mockup focused.** Include the detail needed to judge the design question; the frame's mock elements are useful for wireframes.
 
 ## CSS Classes Available
 

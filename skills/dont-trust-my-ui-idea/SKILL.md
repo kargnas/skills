@@ -17,7 +17,7 @@ Our repository is usually old with a lot of existing source code and years of hi
 2. **Clarify only if the capability itself is ambiguous.** One question per message, multiple choice when possible. Do not ask about scope, token cost, or whether to open the preview.
 3. **Dispatch the clean-context subagent** for concept 8 (see `## The Don't Trust My Idea concept`) so it runs while you draft the other seven.
 4. **Start the browser preview** with `scripts/start-server.sh --project-dir <project root> --open` and follow `references/visual-companion.md`. Invoking this skill is the approval: never ask before opening it, never mention token cost, and prefer an HTML preview over ASCII.
-5. **Push all eight concepts on one screen** as a single-select card grid (override the count only if the user asks for a specific number):
+5. **Create eight distinct UI concepts** (override the count only if the user asks for a specific number). Match the preview's fidelity and presentation to the design question using `references/visual-companion.md`, and make every concept available for comparison before the user chooses:
    1. Your own recommendation
    2. The approach a market leader would most commonly use
    3. The standard approach global developers would use
