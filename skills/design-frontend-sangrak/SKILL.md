@@ -3,7 +3,7 @@ name: design-frontend-sangrak
 description: Use when starting frontend work in a project with no existing design system, or when asked to review/audit web UI. Default design baseline for new screens, plus container-first responsive rules, URL-first routing, theme/i18n defaults, and applied UX laws.
 metadata:
   author: kargnas
-  version: "0.7.0"
+  version: "0.7.1"
   argument-hint: <file-or-pattern>
 ---
 
@@ -73,7 +73,6 @@ New projects adopt these values as-is; existing projects with their own tokens k
 - No horizontal overflow at any width. `100dvh`, not `100vh`.
 - Type and spacing stay on the fixed scale — no `clamp()`. Width changes column count and region visibility, nothing else.
 - Verify in one window at 375 / 800 / 1280. 800 must read as a narrow desktop, not a phone.
-- If `frontend-taste` is also loaded, its "single column below 768px" rule loses to this section.
 
 ### Routing & URL
 
