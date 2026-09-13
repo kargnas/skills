@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
   "name": "kargnas-plugins",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Kargnas' public agent skills for Claude Code, Codex, and OpenCode — flat skills/ layout consumable by npx skills, plus Claude Code native plugins",
   "owner": {
     "name": "Sangrak Choi",
@@ -12,7 +12,7 @@
       "name": "kargnas-skills",
       "source": "./",
       "description": "Kargnas' agent skills — AI-ready project setup, VS Code scaffolding, skill authoring/hardening tools, GPT-tell removal, Git-trailer decision context, idea-to-global-standard ideation, and a frontend design baseline with container-first responsive rules and applied UX laws",
-      "version": "1.2.0",
+      "version": "1.2.1",
       "category": "development"
     }
   ]

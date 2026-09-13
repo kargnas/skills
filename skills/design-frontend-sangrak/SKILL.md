@@ -1,9 +1,9 @@
 ---
 name: design-frontend-sangrak
-description: Use when starting frontend work in a project with no existing design system, or when asked to review/audit web UI. Default design baseline for new screens, plus container-first responsive rules and applied UX laws.
+description: Use when starting frontend work in a project with no existing design system, or when asked to review/audit web UI. Default design baseline for new screens, plus container-first responsive rules, URL-first routing, theme/i18n defaults, and applied UX laws.
 metadata:
   author: kargnas
-  version: "0.6.0"
+  version: "0.7.0"
   argument-hint: <file-or-pattern>
 ---
 
@@ -75,6 +75,18 @@ New projects adopt these values as-is; existing projects with their own tokens k
 - Verify in one window at 375 / 800 / 1280. 800 must read as a narrow desktop, not a phone.
 - If `frontend-taste` is also loaded, its "single column below 768px" rule loses to this section.
 
+### Routing & URL
+
+- **URL first.** User intent (tab, filter, sort, page, selected item, open panel) writes the URL; the UI is a function of the URL and re-renders from it. Never mutate state and then "sync" the URL afterwards — no parallel `useState` copy of anything the URL already says.
+- A screen without a route is unfinished: every new page, tab, panel, and modal gets its route in the same PR. Verify by pasting the URL into a fresh tab.
+- Navigation is `<a>`/`<Link>` (Cmd-click works); opening a modal/panel pushes history so Back closes it, filter/sort changes replace.
+
+### Theme & Language
+
+- Theme selector is three-way `System / Light / Dark`, default System (`prefers-color-scheme`), persisted; `html.dark` drives the token table above. Nothing ships light-only.
+- Language selector lists `Auto` first (from `navigator.languages`, never IP), then each supported language; default Auto, persisted.
+- No hardcoded UI strings, ever — internal tools and prototypes included. Every user-visible string goes through the i18n layer (`t()`), one translation file per locale, keys added in the same PR as the UI.
+
 ## UX Laws (applied)
 
 One decision rule per law plus the code smell that violates it. No theory — only the ruling.
@@ -100,7 +112,6 @@ One decision rule per law plus the code smell that violates it. No theory — on
 - No gradients, no decorative icons beyond the established icon set of the project.
 - Chart libraries (recharts) for multi-series dashboards; inline SVG only for sparklines.
 - No new font sizes, weights, or spacing values outside the scale above.
-- No hardcoded UI strings — everything goes through the project's i18n layer (`t()`).
 - Margin/padding must be consistent with sibling components of the same purpose; misaligned spacing is a bug, not a nit.
 - Loading states: distinguish initializing (no data yet) from loading (refresh); show an animated spinner; don't leave stale data visible during a new load unless explicitly requested.
 - **Stat tiles / big numbers.** A row of label + huge number is the signature AI-slop dashboard move. Rules:
@@ -148,3 +159,6 @@ One decision rule per law plus the code smell that violates it. No theory — on
 | `window.confirm` on a reversible action | Undo toast; confirm only when nothing can bring it back |
 | Small thumbnail with no enlarge | Click opens the original |
 | Result panel with no export | Copy as Markdown |
+| `setFilter(x)` then `router.push(?filter=x)` | Push the URL; derive the filter from `searchParams` |
+| New tab/panel component with no route | Register the route in the same PR; open the URL in a fresh tab to verify |
+| Two-way `Light / Dark` toggle, or a language list without Auto | `System / Light / Dark` and `Auto` + languages, System/Auto as defaults |
