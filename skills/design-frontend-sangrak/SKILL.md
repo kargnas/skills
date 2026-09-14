@@ -3,16 +3,33 @@ name: design-frontend-sangrak
 description: Use when starting frontend work in a project with no existing design system, or when asked to review/audit web UI. Default design baseline for new screens, plus container-first responsive rules, URL-first routing, theme/i18n defaults, and applied UX laws.
 metadata:
   author: kargnas
-  version: "0.7.1"
+  version: "0.8.0"
   argument-hint: <file-or-pattern>
 ---
 
 # Design Frontend (Sangrak)
 
+## Review Preflight
+
+When the current request asks for a review or audit:
+
+1. MUST fetch `https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md` with WebFetch before writing findings.
+2. MUST verify that WebFetch returned the current rule set and output format. If it failed, report the failure instead of writing findings.
+3. Read or search the review target and apply both rule sets.
+
+A review without a successful WebFetch call is invalid.
+
 Two modes, both grounded in the same design system below:
 
 - **Build mode** — writing/editing UI code: apply the design system directly.
 - **Review mode** — asked to review/audit UI: check code against the design system AND the fetched Vercel guidelines, output findings as terse `file:line` entries.
+
+For transitions, animation, or motion-token work, MUST read and follow the bundled [Transitions.dev guide](sub-skills/transitions-dev/GUIDE.md). This design system wins when its visual, accessibility, review-output, or mutation rules conflict with the bundled guide.
+
+Transition references: [01](sub-skills/transitions-dev/01-card-resize.md), [02](sub-skills/transitions-dev/02-number-pop-in.md), [03](sub-skills/transitions-dev/03-notification-badge.md), [04](sub-skills/transitions-dev/04-text-states-swap.md), [05](sub-skills/transitions-dev/05-menu-dropdown.md), [06](sub-skills/transitions-dev/06-modal.md), [07](sub-skills/transitions-dev/07-panel-reveal.md), [08](sub-skills/transitions-dev/08-page-side-by-side.md).
+[09](sub-skills/transitions-dev/09-icon-swap.md), [10](sub-skills/transitions-dev/10-success-check.md), [11](sub-skills/transitions-dev/11-avatar-group-hover.md), [12](sub-skills/transitions-dev/12-error-state-shake.md), [13](sub-skills/transitions-dev/13-input-clear-dissolve.md), [14](sub-skills/transitions-dev/14-skeleton-reveal.md), [15](sub-skills/transitions-dev/15-shimmer-text.md), [16](sub-skills/transitions-dev/16-tabs-sliding.md).
+[17](sub-skills/transitions-dev/17-tooltip.md), [18](sub-skills/transitions-dev/18-texts-reveal.md), [19](sub-skills/transitions-dev/19-card-tilt.md), [20](sub-skills/transitions-dev/20-plus-menu-morph.md), [21](sub-skills/transitions-dev/21-accordion.md), [22](sub-skills/transitions-dev/22-toast.md), [23](sub-skills/transitions-dev/23-like-button.md), [24](sub-skills/transitions-dev/24-learn-more-hover.md).
+[25](sub-skills/transitions-dev/25-checkbox-check.md), [26](sub-skills/transitions-dev/26-spinning-counter.md), [27](sub-skills/transitions-dev/27-toggle.md), [28](sub-skills/transitions-dev/28-thinking-states.md), [29](sub-skills/transitions-dev/29-reasoning-stream.md), [30](sub-skills/transitions-dev/30-streaming-text.md), [31](sub-skills/transitions-dev/31-matrix-loader.md), [32](sub-skills/transitions-dev/32-banner-stacking.md), [shared motion tokens](sub-skills/transitions-dev/_root.css).
 
 ## Design System
 
@@ -124,17 +141,17 @@ One decision rule per law plus the code smell that violates it. No theory — on
 - Long-text containers get `break-words`; flex/grid children that hold text get `min-w-0` (the classic invisible-overflow bug).
 - `transition: all` is forbidden — name the transitioned properties. Respect `motion-reduce`.
 - Tap targets get `touch-action: manipulation`.
+- Every clickable element shows `cursor-pointer` — buttons, links styled as buttons, clickable rows/cards/list items, tabs, chips, icon buttons. Tailwind v4 Preflight sets `cursor: default` on `<button>`, so `<button>` is NOT exempt: add the base rule (`button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer }`) once, or the class per element. Disabled controls get `cursor-not-allowed`; text inputs keep the I-beam.
+- Every screen is usable on mobile web (375px wide, touch, no hover): tap targets are at least 44×44px (`min-h-11`, dense table rows included), nothing is hover-only — an action revealed on `hover:` is also always visible on touch (`pointer-coarse:opacity-100`) or reachable from a tap menu, and horizontal scroll lives only inside tables/code (`overflow-x-auto` on that container), never on the page. Check 375px before calling a screen done.
 - Decorative elements get `aria-hidden`.
 
 ## Review Mode
 
-1. Fetch fresh guidelines before each review:
+1. Complete the Review Preflight above.
 
    ```
    https://raw.githubusercontent.com/vercel-labs/web-interface-guidelines/main/command.md
    ```
-
-   Use WebFetch. The fetched content contains the full rule set and output format.
 
 2. Read the specified files (or ask which files to review if none given).
 3. Check against BOTH rule sets: the fetched Vercel guidelines and the Design System + UX Laws + Anti-slop sections above.
@@ -152,6 +169,9 @@ One decision rule per law plus the code smell that violates it. No theory — on
 | `p-5`/`p-6` on a card or page | Padding cap is 16px — use `p-4` or below |
 | `outline-none` to "clean up" focus ring | Replace with `focus-visible:ring` |
 | `transition-all` for a quick hover effect | Name the properties (`transition-colors`, `transition-opacity`) |
+| `<button>` without `cursor-pointer` | Tailwind v4 Preflight gives buttons `cursor: default` — add the base rule or the class |
+| `grid-cols-1 lg:grid-cols-3` on a table + sidebar body | Collapse per region at content-min width: `minmax`/`auto-fit` or `@container` |
+| Row action icons that appear on `group-hover` only | Always visible on touch (`pointer-coarse:opacity-100`) or moved into a tap-reachable menu |
 | `grid-cols-1 md:grid-cols-2 lg:grid-cols-4` | `grid-cols-[repeat(auto-fit,minmax(Npx,1fr))]` — let the count derive |
 | Hamburger menu on an 800px desktop window | Gate phone chrome behind `@media (pointer: coarse)`, not a width |
 | `md:flex-row` inside a card that lives in a sidebar | `@container` on the wrapper, `@md:flex-row` on the child |
