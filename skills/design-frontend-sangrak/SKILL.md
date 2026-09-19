@@ -1,9 +1,9 @@
 ---
 name: design-frontend-sangrak
-description: Use when starting frontend work in a project with no existing design system, or when asked to review/audit web UI. Default design baseline for new screens, plus container-first responsive rules, URL-first routing, theme/i18n defaults, and applied UX laws.
+description: Use when starting frontend work in a project with no existing design system, or when asked to review/audit web UI. Default design baseline for new screens, plus container-first responsive rules, URL-first routing, scoped async loading, theme/i18n defaults, and applied UX laws.
 metadata:
   author: kargnas
-  version: "0.8.0"
+  version: "0.8.1"
   argument-hint: <file-or-pattern>
 ---
 
@@ -97,6 +97,13 @@ New projects adopt these values as-is; existing projects with their own tokens k
 - A screen without a route is unfinished: every new page, tab, panel, and modal gets its route in the same PR. Verify by pasting the URL into a fresh tab.
 - Navigation is `<a>`/`<Link>` (Cmd-click works); opening a modal/panel pushes history so Back closes it, filter/sort changes replace.
 
+### Loading Scope
+
+- Scope pending UI to the smallest region invalidated by the request: a tab replaces its panel, a filter or page change replaces its results, and a chart selection replaces only the dependent chart. Keep the app shell, navigation, headers, and independent sibling regions mounted.
+- A router or network request does not by itself justify a page loader. Whole-page initialization is reserved for the first load when no stable shell or useful content can render. Never subscribe a page to every router/network start event and swap the entire page for a spinner.
+- Show pending feedback at the initiating control or inside the affected region, mark that region with `aria-busy`, and disable only controls that would conflict with the in-flight request.
+- Request only the data the interaction invalidates (`only` for Inertia, a scoped query key, or the framework equivalent). When stale data must disappear, replace only that region and preserve its approximate size to avoid layout shifts.
+
 ### Theme & Language
 
 - Theme selector is three-way `System / Light / Dark`, default System (`prefers-color-scheme`), persisted; `html.dark` drives the token table above. Nothing ships light-only.
@@ -129,7 +136,7 @@ One decision rule per law plus the code smell that violates it. No theory — on
 - Chart libraries (recharts) for multi-series dashboards; inline SVG only for sparklines.
 - No new font sizes, weights, or spacing values outside the scale above.
 - Margin/padding must be consistent with sibling components of the same purpose; misaligned spacing is a bug, not a nit.
-- Loading states: distinguish initializing (no data yet) from loading (refresh); show an animated spinner; don't leave stale data visible during a new load unless explicitly requested.
+- Loading states: distinguish initializing (no data yet) from loading (refresh); show an animated spinner in the scope defined above; don't leave stale data visible during a new load unless explicitly requested.
 - **Stat tiles / big numbers.** A row of label + huge number is the signature AI-slop dashboard move. Rules:
   - Big-number treatment (`text-[24px]`) is EARNED by context: the tile must carry a delta vs previous period, a target, or a sparkline. A bare number with no context cannot be a tile — demote it to a table/list row.
   - Cumulative counters (total tokens, total requests, all-time sums) are logs, not KPIs — they belong in a table row, never a stat tile.
@@ -180,4 +187,5 @@ One decision rule per law plus the code smell that violates it. No theory — on
 | Result panel with no export | Copy as Markdown |
 | `setFilter(x)` then `router.push(?filter=x)` | Push the URL; derive the filter from `searchParams` |
 | New tab/panel component with no route | Register the route in the same PR; open the URL in a fresh tab to verify |
+| Every router request replaces the page with one spinner | Track pending state at the interaction and replace only the data-dependent region |
 | Two-way `Light / Dark` toggle, or a language list without Auto | `System / Light / Dark` and `Auto` + languages, System/Auto as defaults |
