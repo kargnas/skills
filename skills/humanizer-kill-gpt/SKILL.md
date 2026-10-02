@@ -264,6 +264,7 @@ These machine-translated structures sound immediately unnatural to native speake
 | `토대/기반 위에 세우다`, `그 위에서` | Literal construction metaphor | `~를 바탕으로`, `~에서 출발하다` |
 | `레이어` for abstract capabilities | Literal "layer" metaphor | Explain the capability, use `기능`, or delete it |
 | `해자` in ordinary business prose | Literal "moat" jargon | Explain the barrier directly |
+|  ̀실측 ̀ as measured things | Overused expression | Use common words 측정된, 경험한, 실제로, or 데이터상 |
 | `묶이다`, `~에 묶입니다` as "bound to" | Literal English mapping | `~를 벗어나지 못하다`, `~ 안에서만 돌아가다` |
 | A full root-cause analysis in response to a one-line status question | Over-explanation is itself an AI tell | Answer `지금은 정상`, `재현 안 됨`; explain only when asked |
 

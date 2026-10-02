@@ -99,6 +99,14 @@ npx -y skills add kargnas/skills --skill dont-trust-my-ui-idea
 npx -y skills add kargnas/skills --skill design-frontend-sangrak
 ```
 
+### `slack-api-readonly`
+
+Slack 사용자 토큰으로 채널, 스레드 permalink, 검색 결과를 읽기 전용으로 가져와 LLM이 읽기 좋은 마크다운 한 문서로 출력합니다. 사용자 ID를 실명으로 바꾸고 mrkdwn을 풀어 쓰며, 이모지·리액션과 타임존 표기를 유지하고 `--files`로 첨부 파일도 내려받습니다. 데스크톱에서 복사한 Slack 텍스트를 정리하는 필터도 함께 들어 있습니다.
+
+```bash
+npx -y skills add kargnas/skills --skill slack-api-readonly
+```
+
 ## Claude Code 플러그인으로 설치
 
 Claude Code에서는 이 저장소를 플러그인 마켓플레이스로 추가할 수도 있습니다.
@@ -136,6 +144,7 @@ codex plugin add kargnas-skills@kargnas-plugins
 | [`minimal-patch-with-subagents`](skills/minimal-patch-with-subagents/) | 병렬 서브에이전트 토론으로 확정된 버그의 최소·최저위험 패치 선택 |
 | [`dont-trust-my-ui-idea`](skills/dont-trust-my-ui-idea/) | Transforms a broad/non-standard idea into a global-standard idea with an eight-concept preview |
 | [`design-frontend-sangrak`](skills/design-frontend-sangrak/) | 디자인 시스템 기본값, 컨테이너 기반 반응형 규칙, 영역별 비동기 로딩, 적용형 UX 법칙, CSS 전환 패턴 32개 |
+| [`slack-api-readonly`](skills/slack-api-readonly/) | Slack 채널·스레드·검색 결과를 읽기 전용 Web API로 가져와 LLM용 마크다운으로 변환 |
 
 ## 라이선스
 

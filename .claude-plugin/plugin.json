@@ -1,7 +1,7 @@
 {
   "name": "kargnas-skills",
-  "description": "Kargnas' agent skills — AI-ready project setup, VS Code scaffolding, skill authoring/hardening tools, GPT-tell removal, Git-trailer decision context, idea-to-global-standard ideation, and a frontend design baseline with container-first responsive rules and applied UX laws",
-  "version": "1.2.2",
+  "description": "Kargnas' agent skills — AI-ready project setup, VS Code scaffolding, skill authoring/hardening tools, GPT-tell removal, Git-trailer decision context, idea-to-global-standard ideation, a frontend design baseline with container-first responsive rules and applied UX laws, and read-only Slack scraping into LLM-ready markdown",
+  "version": "1.3.0",
   "author": {
     "name": "Sangrak Choi",
     "email": "kars@kargn.as"
