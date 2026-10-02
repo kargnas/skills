@@ -107,6 +107,22 @@ Slack 사용자 토큰으로 채널, 스레드 permalink, 검색 결과를 읽�
 npx -y skills add kargnas/skills --skill slack-api-readonly
 ```
 
+### `oss-finder`
+
+GitHub에서 라이브러리, 프레임워크, CLI 도구, 코드를 찾아 스타 수 대신 README를 사람이 손으로 다듬은 날짜 수(polish-days)로 순위를 매깁니다. 회전 PAT 풀, grep.app, Blackbird 웹 인덱스, BigQuery/GHArchive 백엔드와 코드 검색 폴백 체인을 함께 제공하며, `gh search code`가 레이트 리밋에 걸릴 때도 씁니다. 실행할 때마다 PAT 풀 설정을 먼저 확인하고, 없으면 멈춰서 설정 방법을 안내합니다.
+
+```bash
+npx -y skills add kargnas/skills --skill oss-finder
+```
+
+### `skill-finder`
+
+작업에 맞는 설치 가능한 SKILL.md 스킬 패키지를 `npx skills` 마켓플레이스와 GitHub 전체 스윕에서 찾아, 스타나 설치 수가 아니라 실제 사람이 반복 수정한 날짜 수(semantic polish-days)와 내용 깊이로 순위를 매깁니다. GitHub 검색은 `oss-finder`에 위임하므로 두 스킬을 같은 디렉터리에 함께 설치해야 합니다.
+
+```bash
+npx -y skills add kargnas/skills --skill skill-finder oss-finder
+```
+
 ## Claude Code 플러그인으로 설치
 
 Claude Code에서는 이 저장소를 플러그인 마켓플레이스로 추가할 수도 있습니다.
@@ -145,6 +161,8 @@ codex plugin add kargnas-skills@kargnas-plugins
 | [`dont-trust-my-ui-idea`](skills/dont-trust-my-ui-idea/) | Transforms a broad/non-standard idea into a global-standard idea with an eight-concept preview |
 | [`design-frontend-sangrak`](skills/design-frontend-sangrak/) | 디자인 시스템 기본값, 컨테이너 기반 반응형 규칙, 영역별 비동기 로딩, 적용형 UX 법칙, CSS 전환 패턴 32개 |
 | [`slack-api-readonly`](skills/slack-api-readonly/) | Slack 채널·스레드·검색 결과를 읽기 전용 Web API로 가져와 LLM용 마크다운으로 변환 |
+| [`oss-finder`](skills/oss-finder/) | GitHub 레포·코드를 polish-days 기준으로 찾아 순위화하는 검색 백엔드 툴킷 |
+| [`skill-finder`](skills/skill-finder/) | 설치 가능한 SKILL.md 스킬을 마켓플레이스와 GitHub에서 찾아 semantic polish-days로 순위화 |
 
 ## 라이선스
 
