@@ -93,7 +93,7 @@ npx -y skills add kargnas/skills --skill dont-trust-my-ui-idea
 
 ### `design-frontend-sangrak`
 
-디자인 시스템이 없는 프로젝트의 프론트엔드 기본값입니다. 토큰, 밀도 스케일, 컨테이너 쿼리 기반 반응형 규칙, URL 라우팅, 테마·언어 기본값, UX 법칙과 CSS 전환 패턴 32개를 담았습니다. 리뷰 모드에서는 Vercel Web Interface Guidelines와 함께 `file:line` 형식으로 지적합니다.
+디자인 시스템이 없는 프로젝트의 프론트엔드 기본값입니다. 토큰, 밀도 스케일, 컨테이너 쿼리 기반 반응형 규칙, URL 라우팅, 영역별 비동기 로딩, 테마·언어 기본값, UX 법칙과 CSS 전환 패턴 32개를 담았습니다. 리뷰 모드에서는 Vercel Web Interface Guidelines와 함께 `file:line` 형식으로 지적합니다.
 
 ```bash
 npx -y skills add kargnas/skills --skill design-frontend-sangrak
@@ -143,7 +143,7 @@ codex plugin add kargnas-skills@kargnas-plugins
 | [`git-lore`](skills/git-lore/) | Captures, queries, and configures decision context in native Git trailers |
 | [`minimal-patch-with-subagents`](skills/minimal-patch-with-subagents/) | 병렬 서브에이전트 토론으로 확정된 버그의 최소·최저위험 패치 선택 |
 | [`dont-trust-my-ui-idea`](skills/dont-trust-my-ui-idea/) | Transforms a broad/non-standard idea into a global-standard idea with an eight-concept preview |
-| [`design-frontend-sangrak`](skills/design-frontend-sangrak/) | 디자인 시스템 기본값, 컨테이너 기반 반응형 규칙, 적용형 UX 법칙, CSS 전환 패턴 32개 |
+| [`design-frontend-sangrak`](skills/design-frontend-sangrak/) | 디자인 시스템 기본값, 컨테이너 기반 반응형 규칙, 영역별 비동기 로딩, 적용형 UX 법칙, CSS 전환 패턴 32개 |
 | [`slack-api-readonly`](skills/slack-api-readonly/) | Slack 채널·스레드·검색 결과를 읽기 전용 Web API로 가져와 LLM용 마크다운으로 변환 |
 
 ## 라이선스
