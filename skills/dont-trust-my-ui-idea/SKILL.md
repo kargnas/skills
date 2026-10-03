@@ -1,6 +1,6 @@
 ---
 name: dont-trust-my-ui-idea
-description: "Generates multiple UI design options, presents them to the user in a browser preview, and implements the option they choose."
+description: "Generates multiple UI design options, presents them to the user in a browser preview, and implements the option they choose. Runs when you make multiple design choices."
 ---
 
 Goal: Create eight UI design concepts in a browser preview, let the user pick one, then build it.
