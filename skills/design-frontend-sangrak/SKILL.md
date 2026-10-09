@@ -3,7 +3,7 @@ name: design-frontend-sangrak
 description: Use when starting frontend work in a project with no existing design system, when building or theming UI with shadcn/ui or Tailwind CSS, or when asked to review/audit web UI. Default design baseline for new screens, plus container-first responsive rules, URL-first routing, scoped async loading, theme/i18n defaults, and applied UX laws.
 metadata:
   author: kargnas
-  version: "0.9.0"
+  version: "0.9.1"
   argument-hint: <file-or-pattern>
 ---
 
@@ -198,6 +198,9 @@ One decision rule per law plus the code smell that violates it. No theory — on
   - Big-number treatment (`text-kpi`) is EARNED by context: the tile must carry a delta vs previous period, a target, or a sparkline. A bare number with no context cannot be a tile — demote it to a table/list row.
   - Cumulative counters (total tokens, total requests, all-time sums) are logs, not KPIs — they belong in a table row, never a stat tile.
   - Never repeat as a big number what a table on the same screen already shows. The tile row is not a table header.
+- **Avatar initials / name placeholders.** A circle holding one Hangul syllable, surname or given name (`김`, `민`), identifies no one: too many people share each syllable. Rules:
+  - If the people data has no photo field, or most records leave it empty (meeting participants, recordings, imported contacts), draw no avatars. List the names as text, the first one or two and then `+N`, with the full list one click or tap away.
+  - If photos are the norm and one is missing, a Korean name's `AvatarFallback` holds a neutral person icon from the project's icon set. It may hold the two-syllable given name instead only when all three hold: the circle fits two syllables at `text-micro` or larger; the data already stores the given name in its own field (never split a full name, since 남궁·제갈·선우 are two-syllable surnames); and the service supports a small fixed set of languages, such as Korean only or Korean and English.
 
 ## Interaction & Accessibility (required, not optional)
 
@@ -230,6 +233,7 @@ One decision rule per law plus the code smell that violates it. No theory — on
 | Proportional font for a KPI number | `font-mono` (JetBrains Mono) |
 | Card shadow in dark mode | `shadow-card dark:shadow-none` |
 | Left accent border to mark "active" nav item | `bg-primary/10 dark:bg-primary/14` background instead |
+| Avatar letters cut from a Korean name string (`name[0]`, `name.slice(1)`) | Names as text when most people have no photo; otherwise a person icon (given-name exception under Anti-slop) |
 | Brand color written into `--accent` | Brand goes in `--primary`; shadcn's `--accent` is the hover surface |
 | `--bg`/`--panel`/`--ink` defined next to shadcn tokens | Use the shadcn names; map old ones with [references/legacy.md](references/legacy.md) |
 | Using a shadcn component exactly as generated | Apply the "After every `shadcn add`" table first |
