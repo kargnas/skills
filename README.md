@@ -87,6 +87,8 @@ npx -y skills add kargnas/skills --skill minimal-patch-with-subagents
 
 ![dont-trust-my-ui-idea가 띄운 8가지 컨셉 화면](docs/dont-trust-my-ui-idea-concepts.png)
 
+Orca 같은 로컬 프록시를 거쳐도 세션 키로 실시간 연결을 인증합니다. 처음 열 때는 `?key=…`가 포함된 주소를 사용합니다. 실행과 연결 확인 방법은 [브라우저 미리보기 가이드](skills/dont-trust-my-ui-idea/references/visual-companion.md)를 참고하세요.
+
 ```bash
 npx -y skills add kargnas/skills --skill dont-trust-my-ui-idea
 ```

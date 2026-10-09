@@ -24,7 +24,9 @@ scripts/start-server.sh --project-dir /path/to/project --open
 
 Save `screen_dir` and `state_dir` from the response. Share the URL as a fallback too (headless or remote setups will not auto-open).
 
-**The URL contains a session key (`?key=…`).** The server rejects any request without it, so always give the user the complete URL from the `url` field. After the first load the browser keeps the key in a cookie.
+**The URL contains a session key (`?key=…`).** The server rejects any request without it, so always give the user the complete URL from the `url` field. After the first load the browser keeps the key in a cookie and in session storage. The WebSocket sends the stored key explicitly so it also works through a proxy that rewrites the host, such as Orca. When opening a proxy URL, keep the `?key=…` part for that first load too.
+
+**Connection failures:** “Preview disconnected” means the live connection failed; the page retries automatically. Check both the server and the proxy connection if it persists.
 
 **Finding connection info:** The server writes its startup JSON to `$STATE_DIR/server-info`. If you launched it in the background and lost stdout, read that file.
 

@@ -313,6 +313,9 @@ function securityHeaders(headers = {}) {
 }
 
 function isAllowedWebSocketOrigin(req) {
+  // Proxies can rewrite Host; an explicit secret proves access without relying on ambient cookies.
+  const key = queryKey(req.url);
+  if (key && timingSafeEqualStr(key, TOKEN)) return true;
   const origin = req.headers.origin;
   if (!origin) return true;
   const host = req.headers.host;
@@ -332,7 +335,7 @@ function handleRequest(req, res) {
 
   // Mirror the key into a cookie so same-origin subresources (/files/*) can
   // authenticate after bootstrap. HttpOnly keeps it away from page scripts; the
-  // WebSocket Origin check below is what blocks cross-origin localhost injection.
+  // WebSocket Origin check blocks cross-origin requests authenticated only by cookies.
   res.setHeader('Set-Cookie',
     COOKIE_NAME + '=' + TOKEN + '; HttpOnly; SameSite=Strict; Path=/');
 

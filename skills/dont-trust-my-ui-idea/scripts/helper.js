@@ -62,9 +62,9 @@
       'align-items:center;justify-content:center;padding:2rem;text-align:center;' +
       'background:rgba(20,20,22,0.92);color:#f5f5f7;font-family:system-ui,sans-serif';
     el.innerHTML = '<div style="max-width:480px">' +
-      '<h2 style="margin:0 0 .5rem;font-weight:600">Companion paused</h2>' +
-      '<p style="margin:0;opacity:.85">This preview server has stopped. ' +
-      'Ask your coding agent to bring it back — this page reconnects automatically.</p></div>';
+      '<h2 style="margin:0 0 .5rem;font-weight:600">Preview disconnected</h2>' +
+      '<p style="margin:0;opacity:.85">The live connection to this preview was lost. ' +
+      'Reconnecting automatically. If this continues, ask your coding agent to check the connection.</p></div>';
     if (document.body) document.body.appendChild(el);
   }
 
