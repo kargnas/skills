@@ -64,3 +64,6 @@ Calibration examples:
 
 ## NEVER do for design
 - NEVER suggest Metric Card, Stat Card, or KPI Card design. That's a useless & AI smell design.
+- NEVER use an Eyebrow (a.k.a. Overline/Kicker): a small, letter-spaced, ALL-CAPS label above a heading (e.g. `SUBSCRIPTION NOTICE`). That's an AI smell design.
+- NEVER use a left accent border callout (a box or quote with a colored vertical bar on the left edge). That's an AI smell design.
+- NEVER use a hero followed by a 3-column feature card grid (icon + title + short description). That's an AI smell design.
