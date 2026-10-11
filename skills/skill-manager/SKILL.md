@@ -1,6 +1,6 @@
 ---
 name: skill-manager
-description: Skill structure and lifecycle manager — creates, merge a several skills into one to save wasting of tokens from a lot of skills' descriptions. Confirm with the user before running if they want to run this skill with a brief explanation what this skill will do for them.
+description: "Creates, restructures, merges, and splits agent skills: directory layout, bundled guides/scripts/assets, cross-agent placement under .agents/skills, importing community skills, merging several skills into one so fewer descriptions load into every session, and a sanitization pass that checks model IDs against models.dev. Triggers on 스킬 생성, 스킬 병합, 스킬 분리, 스킬 구조 정리, 외부 스킬 가져오기, 스킬 검증, 모델 업그레이드. Step wording and name/description wording go to skill-prompter; finding published skill packages goes to skill-finder. Confirm with the user before running, with a brief explanation of what this skill will do."
 ---
 
 # Skill Manager
@@ -480,7 +480,7 @@ Reconcile the grep output against the `metadata.env` keys. If grep finds a var m
 
 **IF BLOCKED**: grep unavailable → manually scan every script and the body for env access and reconcile against `metadata.env`. Do NOT skip the reconciliation.
 
-Beyond `name` and `description`, the only permitted frontmatter is the optional `metadata` block (e.g. `metadata.env` above, `metadata.upstream`). Do not add other top-level frontmatter fields.
+Beyond `name` and `description`, top-level frontmatter MAY contain only `license`, `allowed-tools` (keep it only when the target host honors it), and the optional `metadata` block (e.g. `metadata.env` above, `metadata.upstream`). Put every other extension under `metadata`; do not add other top-level frontmatter fields.
 
 ##### Body
 
@@ -627,67 +627,35 @@ For detailed examples and counter-examples, see [guides/anti-patterns.md](guides
 
 When a skill references LLM model IDs in its body, scripts, or references, MUST run this sanitization pass before finalizing. Outdated model IDs ship inferior quality and often cost more per token than current alternatives. The user MUST be offered an upgrade with a cost comparison before the skill is marked complete.
 
+Model status MUST come from the live models.dev catalog on every run. Do NOT classify a model from memory or from a model table written into a skill: any such table is stale by the time it ships, so this pass carries none.
+
 ### When this pass runs
 
 MUST run during:
-- Skill creation, during Step 4 (Edit the Skill), before SKILL.md is written to disk
-- Skill editing whenever the diff touches any string matching an LLM model ID pattern
+- Skill creation, during Step 5 (Edit the Skill), after SKILL.md is written and before Dry Run Verification
+- Skill editing whenever the diff adds or changes an LLM model ID
 - Conversation-review maintenance pass when a touched skill references models
 - Explicit user request: "sanitize skill", "check skill models", "스킬 검증", "모델 업그레이드"
 
-### Step 1 [SAN1]: Scan for model references
+### Step 1 [SAN1]: Scan and classify model IDs
 
-**Action**: Run grep across the skill directory for known LLM model ID patterns.
+**Action**: Run the scanner on the skill directory.
 
 ```bash
-grep -rEn '(gpt-[0-9.]+[a-z0-9.-]*|o[0-9]+(-[a-z]+)?|claude-(opus|sonnet|haiku)-[0-9.]+[a-z0-9.-]*|gemini-[0-9.]+[a-z0-9.-]*)' <skill-dir>/
+scripts/scan_model_ids.py <skill-dir>
 ```
 
-Save every match as a `(file, line, matched_id)` tuple.
+The scanner downloads `https://models.dev/api.json`, finds every versioned model ID the catalog lists (including date-pinned snapshots of them) in the skill's text files, and prints one table row per match: location, ID, status, the newest release in the same family at the model's origin provider, that provider, and input/output cost per 1M tokens for both models. Status is CURRENT, OUTDATED (a newer release exists), or UNKNOWN (the catalog cannot place the ID in a family).
 
-**VERIFY**: grep exit code is 0 (matches found) or 1 (no matches). If no matches, SKIP remaining sanitize steps and proceed to Dry Run Verification.
+The scanner only finds IDs that models.dev lists. MUST also read the skill for model names written in prose (for example a model's display name in a rationale sentence) and judge those by hand against models.dev.
 
-### Step 2 [SAN2]: Classify each match
+**VERIFY**: The scanner exits 0 and its last line reads `matches=N outdated=K unknown=U`. If N is 0 and no prose model name was found, SKIP the remaining sanitize steps and proceed to Dry Run Verification.
 
-**Action**: For each matched ID, look up its status using the reference table below. MUST also confirm via `WebFetch https://models.dev` for any ID not present in the table, or when the table's freshness is uncertain.
+### Step 2 [SAN2]: Build the upgrade proposal
 
-| Detected pattern | Status | Suggested replacement (verify with models.dev) |
-|------------------|--------|------------------------------------------------|
-| `gemini-1.x-*` | OUTDATED | `gemini-3-flash-preview` or `gemini-3.1-pro-preview` |
-| `gemini-2.0-*` | OUTDATED | `gemini-3-flash-preview` |
-| `gemini-2.5-flash` | OUTDATED | `gemini-3-flash-preview` |
-| `gemini-2.5-flash-lite` | OUTDATED | `gemini-3-flash-preview` (no flash-lite at 3.x as of 2026-05; reconfirm via models.dev) |
-| `gemini-2.5-pro` | OUTDATED | `gemini-3.1-pro-preview` |
-| `gemini-3-*` (non-preview) | CHECK | reconfirm whether a newer preview revision exists |
-| `claude-3-*`, `claude-3-5-*` | OUTDATED | `claude-haiku-4-5-20251001` / `claude-sonnet-4-5-20250929` |
-| `claude-sonnet-4-20250514` | OUTDATED | `claude-sonnet-4-5-20250929` |
-| `claude-opus-4*` (4.0–4.5) | OUTDATED | `claude-opus-4-7` |
-| `gpt-4*`, `o1-*`, `o3-*` | OUTDATED | `gpt-5.2-2025-12-11` or `gpt-5.2-pro` |
-| `gpt-5-2025-08-07`, `gpt-5-mini-*`, `gpt-5-nano-*` | OUTDATED | `gpt-5.2-2025-12-11` |
-| `gpt-5.1-*` | OUTDATED | `gpt-5.2-2025-12-11` |
+**Action**: MUST emit one proposal block per OUTDATED row, filled from that row's newest ID and costs.
 
-| Lookup outcome | Action |
-|----------------|--------|
-| In table as OUTDATED | Carry replacement to SAN3 |
-| In table as CURRENT | Skip — no proposal needed |
-| Not in table | WebFetch models.dev → classify → if still ambiguous, mark UNKNOWN and continue |
-
-**VERIFY**: Every match has status ∈ {CURRENT, OUTDATED, UNKNOWN}. No match is left unclassified.
-
-### Step 3 [SAN3]: Look up cost for each upgrade pair
-
-**Action**: For every OUTDATED → replacement pair, collect input and output cost per 1M tokens.
-
-Lookup priority:
-1. `WebFetch https://models.dev` (authoritative live data)
-2. Provider pricing pages (fallback)
-3. CLAUDE.md "AI Models" table (cached snapshot; note the date stamp)
-
-**VERIFY**: Each pair has four numbers: `old_input_$/1M`, `old_output_$/1M`, `new_input_$/1M`, `new_output_$/1M`. Missing numbers mark the pair as "cost-unknown" and continue.
-
-### Step 4 [SAN4]: Build the upgrade proposal
-
-**Action**: MUST emit one proposal block per OUTDATED finding.
+A family can be broad. If the newest ID is a different tier or a special-purpose variant of the old model (for example a smaller, image, or realtime model), look up the newest same-tier model in the models.dev catalog instead, and state that substitution in the proposal.
 
 ```
 Outdated model detected: `{old_id}` at `{file}:{line}`
@@ -700,11 +668,11 @@ Outdated model detected: `{old_id}` at `{file}:{line}`
 Apply upgrade? (y / n / skip-all)
 ```
 
-`Δ` MUST be signed (`+12%` increase, `-30%` decrease). For "cost-unknown" pairs, replace the numeric rows with `(cost data unavailable — see models.dev)`.
+`Δ` MUST be signed (`+12%` increase, `-30%` decrease). When the row shows `?` for a cost, replace the numeric rows with `(cost data unavailable — see models.dev)`.
 
-**VERIFY**: One proposal block exists per OUTDATED finding. No proposal exists for CURRENT or UNKNOWN findings.
+**VERIFY**: One proposal block exists per OUTDATED row. No proposal exists for CURRENT or UNKNOWN rows.
 
-### Step 5 [SAN5]: Apply the user's decision
+### Step 3 [SAN3]: Apply the user's decision
 
 **Action**: For each proposal, process the user's reply using the decision table.
 
@@ -719,23 +687,23 @@ MUST NOT auto-upgrade without explicit affirmative reply. Lower cost alone is no
 
 **VERIFY**: Every emitted proposal has a recorded outcome ∈ {applied, declined, skipped}.
 
-### Step 6 [SAN6]: Re-scan and finalize
+### Step 4 [SAN4]: Re-scan and finalize
 
-**Action**: If any replacement was applied in SAN5, re-run the SAN1 grep. Then write a one-line summary to stdout (and to the skill's session/changelog reference if one exists):
+**Action**: If any replacement was applied in SAN3, re-run the SAN1 scanner. Then write a one-line summary to stdout (and to the skill's session/changelog reference if one exists):
 
 ```
 sanitize-{YYYY-MM-DD}: scanned={N}, outdated={K}, applied={A}, declined={D}, unknown={U}
 ```
 
-**VERIFY**: Re-scan grep returns no OUTDATED matches OR every remaining OUTDATED match was explicitly declined in SAN5. Summary line is recorded.
+**VERIFY**: The re-scan shows no OUTDATED row, OR every remaining OUTDATED row was explicitly declined in SAN3. Summary line is recorded.
 
 ### Escape hatches
 
 | Blocker | Fallback |
 |---------|----------|
-| No internet → cannot WebFetch models.dev | Use CLAUDE.md AI Models table only; append "(live confirmation unavailable)" to every proposal |
+| The scanner cannot download models.dev (offline, HTTP error) | Do NOT classify from memory. Write `SANITIZE_PENDING.md` inside the skill dir stating that the pass could not run, and rerun it when the catalog is reachable |
 | User unreachable (unattended/automated run) | Do NOT edit files. Append `SANITIZE_PENDING.md` inside the skill dir listing every OUTDATED finding for later human review |
-| WebFetch fails AND model not in table | Mark UNKNOWN. Do NOT propose. Append to `SANITIZE_PENDING.md` |
+| A row is UNKNOWN | Do NOT propose. Append it to `SANITIZE_PENDING.md` for human review |
 | User declined an upgrade earlier in the same session | Do NOT re-prompt for the same `(file, line, old_id)` tuple |
 
 ## Dry Run Verification
@@ -744,7 +712,7 @@ Every skill creation, modification, merge, or split MUST end with a dry-run veri
 
 ### When dry-run is required
 
-- After creating a new skill (Step 4 complete)
+- After creating a new skill (Step 5 complete)
 - After updating an existing skill's structure
 - After merging multiple skills into one
 - After splitting one skill into multiple skills
@@ -796,7 +764,7 @@ Because skill-manager has no `tracker.py` of its own, dry-run completion is enfo
 
 The Final Quality Checklist's dry-run box CANNOT be ticked while `DRYRUN_PENDING.md` exists in the skill directory. Any later edit to the skill that removes the file MUST be paired with a re-executed, passing dry-run for every original scenario.
 
-For skills that ARE backed by `skill-prompter/scripts/tracker.py` (i.e., the skill has been touched by skill-prompter), the tracker's finalize gate is authoritative and `DRYRUN_PENDING.md` is unnecessary — tracker rejection of `finalize --status completed` plays the same role.
+This signal table and `DRYRUN_PENDING.md` are skill-manager's own gate. When skill-prompter also edited the skill, its `tracker.py` finalize gate applies as well. The two gates check different signals, so neither one replaces the other.
 
 ### Hand-off to skill-prompter
 
@@ -843,4 +811,4 @@ Before considering a skill complete (whether newly created or modified), verify 
 - [ ] The skill works with a fresh Claude instance (no hidden context dependencies)
 - [ ] **Sanitization pass complete** — every LLM model ID in SKILL.md, scripts, and references is CURRENT, or the user explicitly declined the upgrade for that finding (see "Sanitization Pass" section above)
 - [ ] **Dry-run verification passed** every signal, including black-box prompt hygiene (see "Dry Run Verification" section above) — REQUIRED for any skill that was created, modified, merged, or split
-- [ ] **No `DRYRUN_PENDING.md`** present in the skill directory (skill-manager-tracked skills) OR `tracker.py show` reports `Latest signals: PASS` for skill-prompter-tracked skills
+- [ ] **No `DRYRUN_PENDING.md`** present in the skill directory, and `tracker.py show` reports `Latest signals: PASS` when skill-prompter also edited the skill

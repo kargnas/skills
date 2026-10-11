@@ -6,7 +6,7 @@ Manages persistent JSON tracking for skill improvement sessions.
 Enforces strict column rules so LLMs don't need to manage JSON manually.
 
 Usage:
-  python3 tracker.py init --skill NAME --original PATH
+  python3 tracker.py init --skill NAME --original PATH [--reset]
   python3 tracker.py analyze --skill NAME --total-steps N [options]
   python3 tracker.py weakpoints --skill NAME --high "1,2" --medium "3" --low "4,5"
   python3 tracker.py record --skill NAME --phase PHASE --changes TEXT --files-modified TEXT
@@ -16,17 +16,16 @@ Usage:
                               [--signal-verify pass|fail]
                               [--signal-escape pass|fail|na]
   python3 tracker.py audit --skill NAME --passed-steps "S1,S2" --failed-steps "S3" --notes TEXT
-  python3 tracker.py finalize --skill NAME --status STATUS --summary TEXT [--force]
+  python3 tracker.py finalize --skill NAME --status STATUS --summary TEXT [--force REASON]
   python3 tracker.py show --skill NAME [--section SECTION]
   python3 tracker.py list [--status STATUS]
 
 Gate behavior:
-  `finalize --status completed` REJECTS if the skill has no
-  `record --phase dryrun` (or `prompt-dryrun`) entry. The gate also
-  rejects when the latest dryrun record carries structured `signals`
-  with any `False` value (failing fired / tool_call_exact / verify_signal
-  / escape_used). Pass `--force` to override (the override
-  reason MUST be written into `--summary`).
+  `finalize --status completed` REJECTS unless the latest
+  `record --phase dryrun` (or `prompt-dryrun`) entry carries all four
+  signals (fired / tool_call_exact / verify_signal / escape_used) and
+  none of them failed. `--force REASON` overrides the gate and stores
+  the reason as `force_reason`.
 """
 
 import argparse
@@ -64,8 +63,15 @@ def cmd_init(args):
     data = load_data()
     skill = args.skill
 
-    if skill in data["skills"]:
-        print(f"Warning: '{skill}' already tracked. Resetting.")
+    # An existing entry holds the dryrun records the finalize gate reads, so discarding it
+    # takes an explicit --reset.
+    if skill in data["skills"] and not args.reset:
+        print(
+            f"Error: '{skill}' already tracked. Continue it (see 'show'), "
+            "or rerun init with --reset to discard its records.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
     data["skills"][skill] = {
         "original_path": args.original,
@@ -149,6 +155,15 @@ def cmd_weakpoints(args):
 
 
 DRYRUN_PHASES = ("dryrun", "prompt-dryrun")
+REQUIRED_SIGNALS = ("fired", "tool_call_exact", "verify_signal", "escape_used")
+
+
+def _signal_problems(signals: dict) -> tuple[list, list]:
+    """Return (missing, failing) signal names for one dryrun record.
+    `escape_used` is None for "na", so presence is checked by key, not by value."""
+    missing = [k for k in REQUIRED_SIGNALS if k not in signals]
+    failing = [k for k, v in signals.items() if v is False]
+    return missing, failing
 
 
 def cmd_record(args):
@@ -166,10 +181,8 @@ def cmd_record(args):
         "recorded_at": now_iso(),
     }
 
-    # Structured dryrun signals (Phase 8 of skill-prompter / dry-run verification of skill-manager).
-    # We only attach the `signals` block when this record is a dryrun phase AND the caller
-    # actually passed at least one signal flag. This preserves backward compatibility with
-    # legacy `record --phase dryrun ...` calls that don't supply signal flags.
+    # Structured dryrun signals (Phase 8 of skill-prompter). Every dryrun record gets a
+    # `signals` block, so the finalize gate can tell a missing signal from a passing one.
     if args.phase in DRYRUN_PHASES:
         if args.scenario:
             record["scenario"] = args.scenario
@@ -189,8 +202,7 @@ def cmd_record(args):
                 signals[key] = False
             elif raw == "na":
                 signals[key] = None  # explicit not-applicable
-        if signals:
-            record["signals"] = signals
+        record["signals"] = signals
 
     data["skills"][skill]["records"].append(record)
     save_data(data)
@@ -199,11 +211,12 @@ def cmd_record(args):
     print(f"  Phase: {record['phase']}")
     print(f"  Changes: {record['changes'][:100]}...")
     print(f"  Files: {len(record['files_modified'])}")
-    if record.get("signals"):
+    if "signals" in record:
         print(f"  Signals: {record['signals']}")
-        failing = [k for k, v in record["signals"].items() if v is False]
-        if failing:
-            print(f"  WARNING: failing signals -> {failing}. finalize will reject until fixed.")
+        missing, failing = _signal_problems(record["signals"])
+        if missing or failing:
+            print(f"  WARNING: missing signals -> {missing}, failing signals -> {failing}. "
+                  "finalize will reject until fixed.")
 
 
 def cmd_audit(args):
@@ -223,6 +236,12 @@ def cmd_audit(args):
         "notes": args.notes or "",
         "audited_at": now_iso(),
     }
+
+    # An audit that names no step cannot show that Phase 7 checked anything.
+    if not audit["passed_steps"] and not audit["failed_steps"]:
+        print("Error: audit lists no steps. Pass every step ID in --passed-steps or --failed-steps.",
+              file=sys.stderr)
+        sys.exit(2)
 
     data["skills"][skill]["audits"].append(audit)
     save_data(data)
@@ -253,20 +272,17 @@ def cmd_audit(args):
 
 
 def _check_dryrun_gate(skill_entry: dict) -> tuple[bool, str]:
-    """Return (allowed, reason). Allowed only when at least one dryrun record exists
-    and the LATEST dryrun record has no failing structured signals.
-    Legacy dryrun records without `signals` are accepted (presence-only gate)
-    so old workflows keep finalizing; new gated workflows attach signals."""
+    """Return (allowed, reason). Allowed only when the LATEST dryrun record carries
+    all four signals and none of them failed."""
     records = skill_entry.get("records", [])
     dryrun_records = [r for r in records if r.get("phase") in DRYRUN_PHASES]
     if not dryrun_records:
         return False, "no dryrun record found"
-    latest = dryrun_records[-1]
-    signals = latest.get("signals")
-    if signals:
-        failing = [k for k, v in signals.items() if v is False]
-        if failing:
-            return False, f"latest dryrun has failing signals: {failing}"
+    missing, failing = _signal_problems(dryrun_records[-1].get("signals", {}))
+    if missing:
+        return False, f"latest dryrun is missing signals: {missing}"
+    if failing:
+        return False, f"latest dryrun has failing signals: {failing}"
     return True, "ok"
 
 
@@ -278,7 +294,12 @@ def cmd_finalize(args):
         print(f"Error: '{skill}' not initialized.", file=sys.stderr)
         sys.exit(1)
 
-    if args.status == "completed" and not args.force:
+    # A bypass without a reason cannot be audited later.
+    if args.force is not None and not args.force.strip():
+        print("Error: --force needs a non-empty reason.", file=sys.stderr)
+        sys.exit(2)
+
+    if args.status == "completed" and args.force is None:
         allowed, reason = _check_dryrun_gate(data["skills"][skill])
         if not allowed:
             print(
@@ -289,7 +310,7 @@ def cmd_finalize(args):
                 "      --signal-fired pass --signal-tool-call-exact pass \\\n"
                 "      --signal-verify pass --signal-escape na \\\n"
                 "      --changes '<summary>' --files-modified ''\n"
-                "  Override: pass --force AND document the reason in --summary.".replace(
+                "  Override: pass --force \"<reason>\"; the reason is stored as force_reason.".replace(
                     "{skill}", skill
                 ),
                 file=sys.stderr,
@@ -299,15 +320,15 @@ def cmd_finalize(args):
     data["skills"][skill]["status"] = args.status
     data["skills"][skill]["finalized_at"] = now_iso()
     data["skills"][skill]["summary"] = args.summary
-    if args.force:
-        data["skills"][skill]["force_finalized"] = True
+    if args.force is not None:
+        data["skills"][skill]["force_reason"] = args.force
     save_data(data)
 
     print(f"Finalized '{skill}':")
     print(f"  Status: {args.status}")
     print(f"  Summary: {args.summary[:200]}")
-    if args.force:
-        print(f"  WARNING: --force used. Dryrun gate bypassed.")
+    if args.force is not None:
+        print(f"  WARNING: --force used. Dryrun gate bypassed. Reason: {args.force[:200]}")
 
 
 def cmd_show(args):
@@ -340,14 +361,10 @@ def cmd_show(args):
         dryruns = [r for r in entry["records"] if r.get("phase") in DRYRUN_PHASES]
         print(f"  Dryruns: {len(dryruns)}")
         if dryruns:
-            latest = dryruns[-1]
-            sig = latest.get("signals")
-            if sig:
-                failing = [k for k, v in sig.items() if v is False]
-                state = "FAIL" if failing else "PASS"
-                print(f"    Latest signals: {state} ({sig})")
-            else:
-                print(f"    Latest signals: legacy (no structured signals)")
+            sig = dryruns[-1].get("signals", {})
+            missing, failing = _signal_problems(sig)
+            state = "FAIL" if missing or failing else "PASS"
+            print(f"    Latest signals: {state} ({sig})")
 
         if entry["finalized_at"]:
             print(f"  Finalized: {entry['finalized_at']}")
@@ -405,6 +422,8 @@ def main():
     p = sub.add_parser("init", help="Initialize tracking for a skill")
     p.add_argument("--skill", required=True)
     p.add_argument("--original", required=True)
+    p.add_argument("--reset", action="store_true",
+                   help="Discard the existing entry for this skill and start over.")
 
     # analyze
     p = sub.add_parser("analyze", help="Record analysis of original skill")
@@ -454,8 +473,8 @@ def main():
     p.add_argument("--skill", required=True)
     p.add_argument("--status", required=True)
     p.add_argument("--summary", required=True)
-    p.add_argument("--force", action="store_true",
-                   help="Bypass the dryrun gate. Document the reason inside --summary.")
+    p.add_argument("--force", metavar="REASON", default=None,
+                   help="Bypass the dryrun gate. The reason is stored as force_reason.")
 
     # show
     p = sub.add_parser("show", help="Show tracking data")

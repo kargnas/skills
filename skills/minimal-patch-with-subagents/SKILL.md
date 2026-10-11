@@ -373,7 +373,7 @@ Log MUST follow this template:
 ```markdown
 # Minimal Patch Debate Log
 - **Date**: YYYY-MM-DD HH:MM:SS
-- **Orchestrator Model**: {model id, e.g. claude-opus-5}
+- **Orchestrator Model**: {model id}
 - **Bug**: {one-line description}
 - **Repo**: {repo path}
 

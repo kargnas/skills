@@ -1,6 +1,6 @@
 # Evaluation-Driven Skill Development
 
-This file expands on Step 5 (Iterate) of SKILL.md. Read this when creating a new skill from scratch with high reliability requirements, or when an existing skill underperforms in real use.
+This file expands on Step 6 (Iterate) of SKILL.md. Read this when creating a new skill from scratch with high reliability requirements, or when an existing skill underperforms in real use.
 
 ## The Principle: Build Evaluations First
 
