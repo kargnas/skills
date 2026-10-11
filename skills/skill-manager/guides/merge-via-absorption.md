@@ -40,13 +40,7 @@ Empirically, the grep gate also catches absorption laziness: a delegate that cop
 
 ## Delegate-of-choice for absorption work
 
-In rough order of preference:
-
-1. **The host's in-session subagent delegation tool** (Claude Code `Task`/`Agent`, or the equivalent on other hosts) with file+terminal toolsets and the full spec in the delegation context. Uses the parent session's model + auth pool — no CLI quota issues. Verified pattern: 9-min wall, 26 api_calls, completed first try after 3 CLI delegate attempts failed on auth/quota.
-2. **`opencode run`** in the background — only when the parent session model is constrained AND the opencode auth pool is healthy.
-3. **`codex exec`** stdin — only when both above paths are blocked.
-
-The CLI subprocess paths (2, 3) carry the well-documented hang / quota / token-reuse failure modes. The in-session path inherits parent session auth and avoids all CLI-credential failure modes by construction.
+Prefer the host's in-session subagent tool over launching another agent CLI. It reuses the parent session's auth, while CLI subprocesses add hang, quota, and credential failures.
 
 ## Acceptance criteria template for absorption skills
 

@@ -15,7 +15,6 @@ Usage:
                               [--signal-tool-call-exact pass|fail]
                               [--signal-verify pass|fail]
                               [--signal-escape pass|fail|na]
-                              [--signal-model-lanes pass|fail]
   python3 tracker.py audit --skill NAME --passed-steps "S1,S2" --failed-steps "S3" --notes TEXT
   python3 tracker.py finalize --skill NAME --status STATUS --summary TEXT [--force]
   python3 tracker.py show --skill NAME [--section SECTION]
@@ -26,7 +25,7 @@ Gate behavior:
   `record --phase dryrun` (or `prompt-dryrun`) entry. The gate also
   rejects when the latest dryrun record carries structured `signals`
   with any `False` value (failing fired / tool_call_exact / verify_signal
-  / escape_used / model_lanes). Pass `--force` to override (the override
+  / escape_used). Pass `--force` to override (the override
   reason MUST be written into `--summary`).
 """
 
@@ -180,7 +179,6 @@ def cmd_record(args):
             "tool_call_exact": args.signal_tool_call_exact,
             "verify_signal": args.signal_verify,
             "escape_used": args.signal_escape,
-            "model_lanes": args.signal_model_lanes,
         }
         for key, raw in signal_map.items():
             if raw is None:
@@ -251,7 +249,6 @@ def cmd_audit(args):
         print(f"            --scenario '<one-line scenario>' \\")
         print(f"            --signal-fired pass --signal-tool-call-exact pass \\")
         print(f"            --signal-verify pass --signal-escape na \\")
-        print(f"            --signal-model-lanes pass \\")
         print(f"            --changes '<summary>' --files-modified ''")
 
 
@@ -291,7 +288,6 @@ def cmd_finalize(args):
                 "      --scenario '<one-line scenario>' \\\n"
                 "      --signal-fired pass --signal-tool-call-exact pass \\\n"
                 "      --signal-verify pass --signal-escape na \\\n"
-                "      --signal-model-lanes pass \\\n"
                 "      --changes '<summary>' --files-modified ''\n"
                 "  Override: pass --force AND document the reason in --summary.".replace(
                     "{skill}", skill
@@ -445,8 +441,6 @@ def main():
                    help="(dryrun phases only) every VERIFY gate produced a signal")
     p.add_argument("--signal-escape", choices=["pass", "fail", "na"], default=None,
                    help="(dryrun phases only) escape hatches rerouted correctly, or na if none triggered")
-    p.add_argument("--signal-model-lanes", choices=["pass", "fail"], default=None,
-                   help="(dryrun phases only) required low-cost and frontier validation lanes ran black-box")
 
     # audit
     p = sub.add_parser("audit", help="Record audit results")
