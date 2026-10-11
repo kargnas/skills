@@ -41,7 +41,7 @@ npx -y skills add kargnas/skills --skill vscode-ready
 
 ### `skill-manager`
 
-스킬의 생성, 수정, 병합, 분리, 구조 정리, 외부 스킬 가져오기를 관리합니다.
+스킬의 생성, 수정, 병합, 분리, 구조 정리, 외부 스킬 가져오기를 관리합니다. 스킬에 적힌 모델 ID는 실행할 때마다 models.dev에서 조회해 낡은 모델과 최신 대체 모델을 찾습니다.
 
 ```bash
 npx -y skills add kargnas/skills --skill skill-manager

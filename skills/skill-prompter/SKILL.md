@@ -64,7 +64,10 @@ MUST execute every phase below in order. Do NOT skip any phase.
 
 ### Phase 0: Setup Tracking
 
-**Action**: Initialize the improvement tracking system.
+**Action**: Resolve the target skill's installed name, then initialize the improvement tracking system.
+
+1. MUST resolve the exact installed skill name with the host's skill-listing tool and use it as `{SKILL_NAME}` in every tracker call. Do NOT assume a filesystem/category path form like `category:skill` or `category/skill`; many installed skills are addressed by their bare tool name (for example `report-builder`, `message-retriever`, `platform-send`).
+2. Initialize tracking:
 
 ```bash
 # Initialize tracking for target skill
@@ -72,17 +75,21 @@ python3 {SKILL_PROMPTER_DIR}/scripts/tracker.py init --skill "{SKILL_NAME}" --or
 ```
 
 - This creates a tracking entry in `{SKILL_PROMPTER_DIR}/data/improvements.json`
-- Records: skill name, original path, start time, baseline compliance %
+- Records: skill name, original path, start time
 
-**VERIFY**: tracker.py prints `"initialized"` with no errors.
+| init result | Action |
+|-------------|--------|
+| Prints `initialized: {SKILL_NAME}` | Continue to Phase 1 |
+| Exits 1 with `already tracked` | Run `tracker.py show --skill "{SKILL_NAME}"`. Continue that entry, or rerun init with `--reset` only after the user agrees to discard its records |
+
+**VERIFY**: tracker.py prints `initialized: {SKILL_NAME}`, or the existing entry is being continued.
 
 ---
 
 ### Phase 1: Analyze Original Skill
 
-**Action**: Resolve the installed skill name, then read the target skill's SKILL.md and ALL referenced files.
+**Action**: Read the target skill's SKILL.md and ALL referenced files.
 
-0. MUST resolve the exact installed skill name with the host's skill-listing tool before patching. Do NOT assume a filesystem/category path form like `category:skill` or `category/skill`; many installed skills are addressed by their bare tool name (for example `report-builder`, `message-retriever`, `platform-send`).
 1. Read the target SKILL.md completely
 2. List all files in the skill directory (`scripts/`, `references/`, `assets/`)
 3. Read each referenced script and reference file
@@ -264,9 +271,9 @@ GOOD: Keep as 1-2 steps with sub-actions listed inline:
   VERIFY: All 3 outputs saved to {domain}_dns.json
 ```
 
-Why: Weaker LLMs exhaust context/output tokens on long skill files. Skills with >20 steps consistently fail to complete on MiniMax M2.7 and GLM-5-Turbo.
+Why: Weaker LLMs exhaust context/output tokens on long skill files. Skills with >20 steps consistently fail to complete on small models.
 
-**Context-budget escape hatch**: Phase 4 is mechanical text surgery (add step IDs, swap 평서문→RFC 2119, append VERIFY gates) that does NOT need the parent's full conversation context. If the parent session is context-heavy (long build/iteration session), SHOULD delegate Phase 4 to a subagent: pass it the target SKILL.md path, the exact list of headers to rename, the RFC-2119 swaps, and the literal VERIFY-gate text per step. The subagent self-reports, so the parent MUST re-verify by `grep -c "VERIFY \[S" SKILL.md` + header-ID grep + `quick_validate.py` before trusting "done" — do NOT take the subagent summary as proof (verified 2026-06-03: subagent reported 7 VERIFY gates, parent confirmed via grep).
+**Context-budget escape hatch**: Phase 4 is mechanical text surgery (add step IDs, swap 평서문→RFC 2119, append VERIFY gates) that does NOT need the parent's full conversation context. If the parent session is context-heavy (long build/iteration session), SHOULD delegate Phase 4 to a subagent: pass it the target SKILL.md path, the exact list of headers to rename, the RFC-2119 swaps, and the literal VERIFY-gate text per step. The subagent self-reports, so the parent MUST re-verify before trusting "done": `grep -c '^\*\*VERIFY\*\*:' {ORIGINAL_SKILL_PATH}/SKILL.md` MUST equal `grep -cE '^#+ Step [0-9]+ \[S[0-9]+\]' {ORIGINAL_SKILL_PATH}/SKILL.md`, and `python3 {SKILL_MANAGER_DIR}/scripts/quick_validate.py {ORIGINAL_SKILL_PATH}` MUST print `Skill is valid!`. Do NOT take the subagent summary as proof.
 
 **Output**: Write the improved SKILL.md to the skill's directory.
 
@@ -405,11 +412,12 @@ python3 {SKILL_PROMPTER_DIR}/scripts/tracker.py record --skill "{SKILL_NAME}" \
 
 **IF FAILED**: Identify the specific failing steps. Record the dryrun with the matching `--signal-* fail` flag so the gate can reject finalize. Return to Phase 4 and rewrite ONLY those steps. Re-run Phase 7 → Phase 8 in tight loop until clean. Do NOT proceed to Phase 9 with any failing dryrun signal.
 
-**Gate enforcement**: `tracker.py finalize --status completed` now REJECTS the call if:
+**Gate enforcement**: `tracker.py finalize --status completed` REJECTS the call if:
 1. No dryrun (or `prompt-dryrun`) phase record exists, OR
-2. The latest dryrun record has any structured signal equal to `fail`.
+2. The latest dryrun record lacks any of the four signals, OR
+3. The latest dryrun record has any signal equal to `fail`.
 
-The only legitimate override is `--force`, which writes `force_finalized: true` into the entry and REQUIRES the override reason to appear in `--summary`.
+The only legitimate override is `--force "<reason>"`, which stores the reason in the entry as `force_reason`.
 
 ---
 
@@ -483,7 +491,7 @@ python3 {SKILL_PROMPTER_DIR}/scripts/tracker.py finalize --skill "{SKILL_NAME}" 
 - **MUST NOT** use few-shot examples that leak test answers
 - **MUST NOT** change the skill's core purpose without user confirmation
 - **MUST NOT** claim a skill is "dryrun verified" without actually executing Phase 8
-- **MUST NOT** bypass the finalize gate with `--force` unless subagent execution is genuinely unavailable AND the reason is documented in `--summary`
+- **MUST NOT** bypass the finalize gate with `--force` unless subagent execution is genuinely unavailable, and MUST pass that reason as the `--force` value
 - **MUST** preserve all existing functionality while improving wording
 - **MUST** use `scripts/tracker.py` for ALL state tracking (no manual JSON editing)
 - **MUST** delegate structural changes (directory layout, merge, split, modular reorg) to **skill-manager**
@@ -495,15 +503,17 @@ python3 {SKILL_PROMPTER_DIR}/scripts/tracker.py finalize --skill "{SKILL_NAME}" 
 | Variable | Meaning |
 |----------|---------|
 | `{SKILL_PROMPTER_DIR}` | Path to this skill-prompter skill directory |
-| `{SKILL_NAME}` | Name of the skill being improved |
-| `{ORIGINAL_SKILL_PATH}` | Filesystem path to the original skill directory |
+| `{SKILL_MANAGER_DIR}` | Path to the skill-manager skill directory, which holds `scripts/quick_validate.py` |
+| `{SKILL_NAME}` | Installed name of the skill being improved, resolved in Phase 0 |
+| `{ORIGINAL_SKILL_PATH}` | Filesystem path to the original skill directory (the directory, not its SKILL.md file) |
 
 ## Error Handling
 
 | Error | Recovery |
 |-------|----------|
 | Target skill has no SKILL.md | Ask user for the correct path |
-| tracker.py fails | Check Python environment, run `uv pip install -r requirements.txt` |
+| tracker.py fails | Read its stderr. It needs only Python 3.9+ and the standard library, so fix the reported argument or path and rerun |
+| quick_validate.py fails with `No module named 'yaml'` | Install PyYAML for the Python that runs it, then rerun |
 | Improved skill exceeds 5000 words | Delegate split to **skill-manager** |
 | User rejects changes | Ask what specifically to change, go back to Phase 4 |
 | Dry-run fails after 3 rewrite cycles | Stop the loop. Surface the failing steps and ask the user whether the underlying design is correct (may require structural changes — delegate to skill-manager). |
