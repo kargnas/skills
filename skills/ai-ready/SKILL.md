@@ -14,6 +14,16 @@ When this project is mono-repo and has multiple projects (with packages.json, co
 - Ensure having .env.example in every project's root, separated from the root .env.example
 - Ensure having .env.ai-ready in every project's root, separated from the root .env.ai-ready
 
+## Execution plan (parallel lanes)
+
+Run independent work concurrently to cut wall-clock time. Only the main agent edits shared files and commits; concurrent git commits break the index.
+- Lane A (read-only, start right away with step 1): dispatch read-only subagents for step 7.2-7.3 and the step 8 product research, e.g. one for the recent 300 commits, one for the recent 30 PRs, one for `tree` + human-written comments, one for end-user features. Each returns a concise summary of patterns, rules, and features; none edits files.
+- Lane B (main agent, sequential): steps 1 → 2 → 3 → 4 → 5.
+- Lane C (after step 3.5 fixes the verify commands): step 6 CI, editing only `.github/` and `.vscode/`, concurrently with steps 4-5.
+- Join: write steps 7.4-7.8 and 8 from the Lane A summaries, then steps 9 → 10 → 11.
+- Keep these sequential: code fixes in step 3, the flake check's two runs (shared DB files or ports cause false flakes), the red check, step 5.3, and every commit.
+- Do not wait for approval mid-run. Commit each step locally, collect a summary per commit, and present them all for review in step 11. Never push. Ask conditional questions (mandatory secrets in step 5.1, language in step 7.7) in one batch only when they block progress.
+
 1. Update .gitignore
     - AGENTS.md and AI Agent rules shouldn't be in .gitignore
         - Check if AGENTS.md, CLAUDE.md, .cursorrules or any other AGENT related files are in `.gitignore`
@@ -53,17 +63,24 @@ When this project is mono-repo and has multiple projects (with packages.json, co
             - For PHP (but without Laravel)
                 - `phpstan/phpstan` for PHP without Laravel
             - Pick some similar popular solutions for other languages and frameworks.
-    3. Run static code analysis and debug any issues with minimum modification 
+    3. Run static code analysis and debug any issues with minimum modification (start the step 3.4 test run concurrently; apply fixes one at a time)
         - Only debug serious issues, add ignore for minor issues:
             - Unused variables, unused imports, unused functions, unused classes
             - Import order, ...
-        - If you have anything you fixed, then show the summary of your modification
-        - Take permission to "commit & continue" from the user
-        - If the user accepts, then commit the changes and continue to the next step
+        - If you have anything you fixed, commit it and record a summary of your modification for step 11
     4. Run tests and debug any issues with minimum modification
-        - If you have anything you fixed, then show the summary of your modification
-        - Take permission to "commit & continue" from the user
-        - If the user accepts, then commit the changes and continue to the next step
+        - If you have anything you fixed, commit it and record a summary of your modification for step 11
+    5. Establish the verify command
+        - Reuse the existing verify path first (what CI runs, then package scripts / Makefile / task runners). Create the smallest entrypoint in the project's native convention only when none exists.
+        - The command must exit non-zero on failure, run unattended and offline (no credentials, network, GPU, or secrets), avoid watch mode, and stay quiet on success.
+        - Time it once. If the whole suite is quick, keep one command. If slow checks would cripple the edit loop, split it into two tiers:
+            - `verify`: lint, typecheck, unit/smoke tests. Normally under ~60 seconds. Run it on every edit loop.
+            - `verify-full`: integration, build, slow tests. Run it at closeout and before a PR.
+    6. Prove the verify loop
+        - Flake check: run the fast tier twice. If only one slow tier exists, run it once and state that limitation. A green that does not repeat is not trusted; fix the flaky test or report it before continuing.
+        - Red check: record one covered file, line, and original text; make one deliberate break; confirm verify fails; then restore exactly that edit. Never use `git checkout` on a file with user changes or a broad `git stash`. New untracked files need explicit restoration too. Confirm `git status` matches the pre-check state.
+        - Run the full tier once after restoration.
+        - Commit, and record the verify command(s) with the timing and check results for step 11
 
 4. Ensure .env file is up-to-date
     1. If .env file is not present, create it from .env.example. If the existing example file name is weird, change it to .env.example.
@@ -148,6 +165,7 @@ When this project is mono-repo and has multiple projects (with packages.json, co
             - Specify framework and libraries used in the codebase
             - How to start development in the local development environment
                 - How to run tests or debug the codebase
+                - The verify command(s) from step 3, what each tier covers and does not cover, and when to run each (`verify` every edit loop, `verify-full` at closeout and before a PR)
                 - Specify if you need to install any external dependencies on your machine (For example, Docker is mandatory)
                 - Specify whether it's mandatory or optional. Mention if there are easy-to-install fallbacks. (Only after you tried and confirmed it's working perfectly)
             - Codebase structure and important classese and functions' responsibilities
@@ -214,5 +232,7 @@ When this project is mono-repo and has multiple projects (with packages.json, co
 9. Look back your commits, and make sure everything isn't bad affecting or too much the codebase. If it is, fix and rewrite it.
 
 10. Make sure there is no issue with building this codebase finally
+    - Run the full verify tier (`verify-full`, or the single verify command) after your last edit and make sure it passes.
 
 11. Show detailed and visualistic response to the user using Emoji, Markdown Table, and lists
+    - Include every per-step commit summary, the verify command(s) with flake/red check results, and any batched questions, so the user reviews everything once.
