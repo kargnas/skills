@@ -266,7 +266,7 @@ GOOD: Keep as 1-2 steps with sub-actions listed inline:
 
 Why: Weaker LLMs exhaust context/output tokens on long skill files. Skills with >20 steps consistently fail to complete on MiniMax M2.7 and GLM-5-Turbo.
 
-**Context-budget escape hatch**: Phase 4 is mechanical text surgery (add step IDs, swap 평서문→RFC 2119, append VERIFY gates) that does NOT need the parent's full conversation context. If the parent session is context-heavy (long build/iteration session), SHOULD delegate Phase 4 to a subagent: pass it the target SKILL.md path, the exact list of headers to rename, the RFC-2119 swaps, and the literal VERIFY-gate text per step. Subagent toolsets `["file","terminal"]`. The subagent self-reports, so the parent MUST re-verify by `grep -c "VERIFY \[S" SKILL.md` + header-ID grep + `quick_validate.py` before trusting "done" — do NOT take the subagent summary as proof (verified 2026-06-03: subagent reported 7 VERIFY gates, parent confirmed via grep).
+**Context-budget escape hatch**: Phase 4 is mechanical text surgery (add step IDs, swap 평서문→RFC 2119, append VERIFY gates) that does NOT need the parent's full conversation context. If the parent session is context-heavy (long build/iteration session), SHOULD delegate Phase 4 to a subagent: pass it the target SKILL.md path, the exact list of headers to rename, the RFC-2119 swaps, and the literal VERIFY-gate text per step. The subagent self-reports, so the parent MUST re-verify by `grep -c "VERIFY \[S" SKILL.md` + header-ID grep + `quick_validate.py` before trusting "done" — do NOT take the subagent summary as proof (verified 2026-06-03: subagent reported 7 VERIFY gates, parent confirmed via grep).
 
 **Output**: Write the improved SKILL.md to the skill's directory.
 
@@ -312,7 +312,7 @@ python3 {SKILL_PROMPTER_DIR}/scripts/tracker.py record --skill "{SKILL_NAME}" \
 
 ### Phase 7: Self-Audit (Static)
 
-**Action**: Re-read the improved SKILL.md as if you are a cost-efficient validator (`gpt-5.6-luna`, `deepseek-v4-flash`, or `glm-5.2` through the `opencode-go` provider with OpenCode CLI). This phase is a STATIC text review — Phase 8 will dynamically execute the skill.
+**Action**: Re-read the improved SKILL.md as if you are a small, cheap model seeing it for the first time. This phase is a STATIC text review — Phase 8 will dynamically execute the skill.
 
 For EACH step, ask:
 1. Can I execute this with ZERO prior context? (Must be YES)
@@ -346,37 +346,19 @@ Pick exactly ONE representative user request that exercises the skill end-to-end
 
 | Method | When to use |
 |--------|-------------|
-| **Black-box subagent delegation (preferred)** | Default. Spawn validators loaded with ONLY the improved SKILL.md, the representative scenario, allowed tools, and the signal schema. The prompt MUST NOT include expected answers, examples, diffs, known weak points, or implementation notes. |
+| **Black-box subagent delegation (preferred)** | Default. Spawn 2 validators, each loaded with ONLY the improved SKILL.md, the representative scenario, allowed tools, and the signal schema. The prompt MUST NOT include expected answers, examples, diffs, known weak points, or implementation notes. |
 | **Manual walkthrough** | Use only if subagent delegation is unavailable. Pretend the original conversation does not exist; for each step, name the exact tool call you would invoke and the input you would pass. Do NOT use hidden expected answers. |
 
-Run the same black-box scenario across BOTH validation lanes:
+Choose the subagent tool and the validator model freely, within two constraints:
 
-**Provider scope (HARD): validators run on `opencode-go/*` ONLY.** All metered (종량제) providers — `opencode/*`, `anthropic/*`, `openai/*`, `github-copilot/*`, `google/*` — are FORBIDDEN for dry-run testing as standing policy, regardless of remaining budget. A family absent from `opencode-go` is simply unavailable; do NOT reach outside it.
-
-**Model allowlist (HARD): validators MUST use exact IDs from the table below.** Do NOT substitute a model from another provider or an older revision.
-
-| Lane (ALL on `opencode-go/*`) | Required |
-|------|---------------------|
-| Cost-efficient | ≥3 distinct families from `gpt-5.6-luna`, `deepseek-v4-flash`, `glm-5.2`, `mimo-v2.5`, `qwen3.7-plus` |
-| Higher-capability | ≥1 of `qwen3.8-max`, `kimi-k3`, `minimax-m3`, `deepseek-v4-pro`, `mimo-v2.5-pro` |
-
-Each validator is one `opencode run`. Write the black-box prompt (improved SKILL.md + scenario + signal schema, NO answer keys) to a temp file once, then:
-
-```bash
-PROMPT="$(cat /tmp/dryrun-prompt.txt)"
-timeout 300 opencode run "$PROMPT" --model opencode-go/{model} >"/tmp/dryrun-{tag}.out" 2>&1
-```
-
-Two operational rules (verified 2026-06-13 failure modes):
-- **Run SERIALLY** — parallel `opencode run` crashes with `database is locked` (shared SQLite). On a lock, retry that one model after the prior exits.
-- **Empty-at-timeout ≠ fail** — reasoning-heavy models (minimax, qwen-max) may exceed `timeout 300`. Re-run that model with a longer timeout OR substitute another `opencode-go` family; do NOT record a signal `fail`.
+- Each validator MUST start from a clean context. If the subagent tool copies the parent conversation by default, turn that off; a validator that has seen the diff passes for the wrong reason.
+- Each validator MUST run on a small, cheap model set explicitly, never inherited from the parent session. This phase tests whether a weak model fires every step.
 
 **IF BLOCKED**: subagent system unavailable AND manual walkthrough impractical → Document the blocker in the dryrun record and mark the skill as "audit-only complete" rather than "dryrun verified". Do NOT claim the skill is dryrun-verified without an actual dryrun.
-**IF A MODEL FAMILY IS UNAVAILABLE**: run every available validator, record the missing family in the dryrun record, and mark the dryrun incomplete unless the user explicitly accepts the gap.
 
 #### 8.3 Record the result for every step
 
-For each step in the simulation, record four step-level signals. For the whole dry-run, also record one model-lane signal.
+For each step in the simulation, record four step-level signals.
 
 | Signal | Meaning |
 |--------|---------|
@@ -393,12 +375,12 @@ ALL of the following MUST be true:
 - Every `verify_signal = yes` (every VERIFY produced a signal)
 - No step has `tool_call_exact = no` for the named tool
 - No `escape_used = no` for triggered fallbacks
-- Every required validation lane completed without leaking answer keys or few-shot hints
+- Every validator ran black-box, without answer keys or few-shot hints
 - The scenario reached the documented final output
 
 #### 8.5 Persist the dry-run record
 
-MUST record the five signals as structured flags so the finalize gate can verify them automatically. The signal flags MUST be:
+MUST record the four signals as structured flags so the finalize gate can verify them automatically. The signal flags MUST be:
 
 | Flag | Value when PASS |
 |------|-----------------|
@@ -406,7 +388,6 @@ MUST record the five signals as structured flags so the finalize gate can verify
 | `--signal-tool-call-exact` | `pass` if every step used the named tool, else `fail` |
 | `--signal-verify` | `pass` if every VERIFY gate produced a signal, else `fail` |
 | `--signal-escape` | `pass` if a fallback rerouted correctly, `fail` if a triggered fallback failed, `na` if no fallback was triggered |
-| `--signal-model-lanes` | `pass` if BOTH lanes ran black-box on `opencode-go/*` — cost-efficient (≥3 distinct families from `gpt-5.6-luna`, `deepseek-v4-flash`, `glm-5.2`, `mimo-v2.5`, `qwen3.7-plus`) AND higher-capability (≥1 of `qwen3.8-max`, `kimi-k3`, `minimax-m3`, `deepseek-v4-pro`, `mimo-v2.5-pro`) — else `fail` |
 
 ```bash
 python3 {SKILL_PROMPTER_DIR}/scripts/tracker.py record --skill "{SKILL_NAME}" \
@@ -416,7 +397,6 @@ python3 {SKILL_PROMPTER_DIR}/scripts/tracker.py record --skill "{SKILL_NAME}" \
   --signal-tool-call-exact pass \
   --signal-verify pass \
   --signal-escape na \
-  --signal-model-lanes pass \
   --changes "fired={S1,S2,...} | skipped={ids} | verify-failed={ids} | escape-failed={ids}" \
   --files-modified ""
 ```
@@ -503,7 +483,6 @@ python3 {SKILL_PROMPTER_DIR}/scripts/tracker.py finalize --skill "{SKILL_NAME}" 
 - **MUST NOT** use few-shot examples that leak test answers
 - **MUST NOT** change the skill's core purpose without user confirmation
 - **MUST NOT** claim a skill is "dryrun verified" without actually executing Phase 8
-- **MUST NOT** run any part of a dry-run outside the exact `opencode-go/*` allowlist in Phase 8.2
 - **MUST NOT** bypass the finalize gate with `--force` unless subagent execution is genuinely unavailable AND the reason is documented in `--summary`
 - **MUST** preserve all existing functionality while improving wording
 - **MUST** use `scripts/tracker.py` for ALL state tracking (no manual JSON editing)
