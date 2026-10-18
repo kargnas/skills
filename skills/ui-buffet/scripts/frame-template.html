@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>UI Concept Preview</title>
+  <title>UI Buffet</title>
   <style>
     /*
      * UI CONCEPT PREVIEW FRAME TEMPLATE
@@ -97,7 +97,6 @@
     h3 { font-size: 1.1rem; font-weight: 600; margin-bottom: 0.25rem; }
     .subtitle { color: var(--text-secondary); margin-bottom: 1.5rem; }
     .section { margin-bottom: 2rem; }
-    .label { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.5rem; }
 
     /* ===== OPTIONS (for A/B/C choices) ===== */
     .options { display: flex; flex-direction: column; gap: 0.75rem; }
@@ -193,7 +192,8 @@
 </head>
 <body>
   <div class="header">
-    <div class="brand"><a href="https://github.com/kargnas/skills/tree/main/skills/dont-trust-my-ui-idea">Don't Trust My Idea</a></div>
+    <div class="brand"><a href="https://github.com/kargnas/skills/tree/main/skills/ui-buffet">UI Buffet</a></div>
+    <script>if (navigator.language.startsWith('ko')) document.querySelector('.brand a').textContent = 'UI 뷔페';</script>
     <div class="status">Connecting…</div>
   </div>
 
@@ -202,6 +202,8 @@
       <!-- CONTENT -->
     </div>
   </div>
+  <!-- Only a direct-child <title> names the screen, so an inline SVG icon's <title> never ends up in the tab. -->
+  <script>document.title = [document.querySelector('#frame-content > title')?.textContent.trim(), document.querySelector('.brand a').textContent].filter(Boolean).join(' · ');</script>
 
 </body>
 </html>

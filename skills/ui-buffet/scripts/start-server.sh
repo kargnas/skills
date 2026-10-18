@@ -6,14 +6,14 @@
 # Each session gets its own directory to avoid conflicts.
 #
 # Options:
-#   --project-dir <path>  Store session files under <path>/.agents/ai-tasks/dont-trust-my-ui-idea/
+#   --project-dir <path>  Store session files under <path>/.agents/ai-tasks/ui-buffet/
 #                         instead of /tmp. Files persist after server stops.
 #   --host <bind-host>    Host/interface to bind (default: 127.0.0.1).
 #                         Use 0.0.0.0 in remote/containerized environments.
 #   --url-host <host>     Hostname shown in returned URL JSON.
 #   --idle-timeout-minutes <n>  Shut down after n minutes idle (default 240 = 4h).
-#   --open                Auto-open the browser on the first screen (use only
-#                         after the user approves the visual companion).
+#   --open                Auto-open the browser on the first screen (the user
+#                         has approved the buffet by this point).
 #   --foreground          Run server in the current terminal (no backgrounding).
 #   --background          Force background mode (overrides Codex auto-foreground).
 
@@ -48,11 +48,11 @@ while [[ $# -gt 0 ]]; do
       export BRAINSTORM_OPEN=1
       shift
       ;;
-    --foreground|--no-daemon)
+    --foreground)
       FOREGROUND="true"
       shift
       ;;
-    --background|--daemon)
+    --background)
       FORCE_BACKGROUND="true"
       shift
       ;;
@@ -114,11 +114,11 @@ umask 077
 SESSION_ID="$$-$(date +%s)"
 
 if [[ -n "$PROJECT_DIR" ]]; then
-  SESSION_DIR="${PROJECT_DIR}/.agents/ai-tasks/dont-trust-my-ui-idea/${SESSION_ID}"
+  SESSION_DIR="${PROJECT_DIR}/.agents/ai-tasks/ui-buffet/${SESSION_ID}"
   # Persist the bound port and key per project so a restart reuses them and an
   # already-open browser tab reconnects to the same URL with a valid cookie.
-  export BRAINSTORM_PORT_FILE="${PROJECT_DIR}/.agents/ai-tasks/dont-trust-my-ui-idea/.last-port"
-  export BRAINSTORM_TOKEN_FILE="${PROJECT_DIR}/.agents/ai-tasks/dont-trust-my-ui-idea/.last-token"
+  export BRAINSTORM_PORT_FILE="${PROJECT_DIR}/.agents/ai-tasks/ui-buffet/.last-port"
+  export BRAINSTORM_TOKEN_FILE="${PROJECT_DIR}/.agents/ai-tasks/ui-buffet/.last-token"
 else
   SESSION_DIR="/tmp/brainstorm-${SESSION_ID}"
 fi
@@ -131,6 +131,12 @@ SERVER_ID_FILE="${STATE_DIR}/server-instance-id"
 # Create fresh session directory with content and state peers
 mkdir -p "${SESSION_DIR}/content" "$STATE_DIR"
 
+# Session files embed the key; keep them out of the target repo's commits even
+# when that repo does not ignore .agents/ai-tasks/ itself.
+if [[ -n "$PROJECT_DIR" ]]; then
+  printf '*\n' > "${PROJECT_DIR}/.agents/ai-tasks/ui-buffet/.gitignore"
+fi
+
 SERVER_ID=""
 if [[ -r /dev/urandom ]]; then
   SERVER_ID="$(od -An -N24 -tx1 /dev/urandom 2>/dev/null | tr -d ' \n' || true)"
@@ -140,13 +146,6 @@ if ! [[ "$SERVER_ID" =~ ^[A-Za-z0-9_-]{32,64}$ ]]; then
 fi
 printf '%s\n' "$SERVER_ID" > "$SERVER_ID_FILE"
 chmod 600 "$SERVER_ID_FILE" 2>/dev/null || true
-
-# Kill any existing server
-if [[ -f "$PID_FILE" ]]; then
-  old_pid=$(cat "$PID_FILE")
-  kill "$old_pid" 2>/dev/null
-  rm -f "$PID_FILE"
-fi
 
 cd "$SCRIPT_DIR" || exit 1
 

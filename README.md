@@ -79,18 +79,20 @@ npx -y skills add kargnas/skills --skill git-lore
 npx -y skills add kargnas/skills --skill minimal-patch-with-subagents
 ```
 
-### `dont-trust-my-ui-idea`
+### `ui-buffet`
 
-넓거나 한국 표준에 치우친 기능 아이디어를 8가지 컨셉 프리뷰로 확장해, 글로벌 표준 아이디어로 다듬습니다. 8번째 컨셉은 조건을 전혀 모르는 클린 컨텍스트 서브에이전트가 처음부터 다시 상상합니다.
+구현하기 전에 8가지 UI/UX 디자인 컨셉을 브라우저 프리뷰로 보여 주고, 사용자가 고른 컨셉을 구현합니다. 컨셉은 추천안, 시장 선도 서비스의 방식, 글로벌 표준 방식, 관습에서 벗어난 방식, 의도적으로 반대 입장을 취한 방식, 한국과 중국 개발자의 표준 방식으로 구성됩니다. 8번째 컨셉은 조건을 전혀 모르는 클린 컨텍스트 서브에이전트가 처음부터 다시 상상합니다. 카드마다 주요 작업을 끝내는 데 필요한 클릭·입력 수를 배지로 표시합니다.
 
-내장된 로컬 서버가 컨셉을 브라우저에 띄우고, 클릭한 컨셉을 기록합니다. 비교 목적에 따라 카드, 나란히 놓은 목업, 실제 화면 크기의 프리뷰를 사용합니다. 레이아웃은 와이어프레임으로, 시각적 완성도는 글꼴·간격·색상·이미지를 갖춘 목업으로 비교합니다. 아래는 "챔피언 상세 페이지의 카운터 섹션에 티어 필터, 아이템 툴팁, 캐싱을 넣고 싶다"는 요청의 카드형 프리뷰 예시입니다.
+여러 UI/UX 선택지를 요청하거나 구현 전에 디자인을 함께 고민하려는 요청에서 스스로 활성화되며, 이때는 실행할지 한 번 먼저 묻습니다. 스킬 이름으로 직접 호출하면 묻지 않고 바로 실행합니다.
 
-![dont-trust-my-ui-idea가 띄운 8가지 컨셉 화면](docs/dont-trust-my-ui-idea-concepts.png)
+내장된 로컬 서버가 컨셉을 브라우저에 띄우고, 클릭한 컨셉을 기록합니다. 비교 목적에 따라 카드, 나란히 놓은 목업, 실제 화면 크기의 프리뷰를 사용합니다. 레이아웃은 와이어프레임으로, 시각적 완성도는 목업으로 비교하며, 두 방식 모두 프로젝트의 디자인 토큰을 그대로 사용합니다. 아래는 "챔피언 상세 페이지의 카운터 섹션에 티어 필터, 아이템 툴팁, 캐싱을 넣고 싶다"는 요청의 카드형 프리뷰 예시입니다.
 
-Orca 같은 로컬 프록시를 거쳐도 세션 키로 실시간 연결을 인증합니다. 처음 열 때는 `?key=…`가 포함된 주소를 사용합니다. 실행과 연결 확인 방법은 [브라우저 미리보기 가이드](skills/dont-trust-my-ui-idea/references/visual-companion.md)를 참고하세요.
+![ui-buffet가 띄운 8가지 컨셉 화면](docs/ui-buffet-concepts.png)
+
+Orca 같은 로컬 프록시를 거쳐도 세션 키로 실시간 연결을 인증합니다. 처음 열 때는 `?key=…`가 포함된 주소를 사용합니다. 실행과 연결 확인 방법은 [브라우저 미리보기 가이드](skills/ui-buffet/references/visual-companion.md)를 참고하세요.
 
 ```bash
-npx -y skills add kargnas/skills --skill dont-trust-my-ui-idea
+npx -y skills add kargnas/skills --skill ui-buffet
 ```
 
 ### `design-frontend-sangrak`
@@ -160,7 +162,7 @@ codex plugin add kargnas-skills@kargnas-plugins
 | [`humanizer-kill-gpt`](skills/humanizer-kill-gpt/) | 영어·한국어 글의 GPT·LLM 문체 흔적 제거 |
 | [`git-lore`](skills/git-lore/) | Captures, queries, and configures decision context in native Git trailers |
 | [`minimal-patch-with-subagents`](skills/minimal-patch-with-subagents/) | 병렬 서브에이전트 토론으로 확정된 버그의 최소·최저위험 패치 선택 |
-| [`dont-trust-my-ui-idea`](skills/dont-trust-my-ui-idea/) | Transforms a broad/non-standard idea into a global-standard idea with an eight-concept preview |
+| [`ui-buffet`](skills/ui-buffet/) | Previews several UI/UX design concepts in the browser and builds the pick |
 | [`design-frontend-sangrak`](skills/design-frontend-sangrak/) | shadcn/ui·Tailwind CSS v4 기반 디자인 시스템 기본값, 컨테이너 기반 반응형 규칙, 영역별 비동기 로딩, 적용형 UX 법칙, CSS 전환 패턴 32개 |
 | [`slack-api-readonly`](skills/slack-api-readonly/) | Slack 채널·스레드·검색 결과를 읽기 전용 Web API로 가져와 LLM용 마크다운으로 변환 |
 | [`oss-finder`](skills/oss-finder/) | GitHub 레포·코드를 polish-days 기준으로 찾아 순위화하는 검색 백엔드 툴킷 |

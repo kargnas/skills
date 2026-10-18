@@ -1,0 +1,5 @@
+interface:
+  display_name: "UI Buffet"
+  short_description: "Preview several UI/UX concepts, pick one, build it"
+policy:
+  allow_implicit_invocation: true

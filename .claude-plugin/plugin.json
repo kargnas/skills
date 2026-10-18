@@ -1,7 +1,7 @@
 {
   "name": "kargnas-skills",
-  "description": "Kargnas' agent skills — AI-ready project setup, VS Code scaffolding, skill authoring/hardening tools, GPT-tell removal, Git-trailer decision context, idea-to-global-standard ideation, a frontend design baseline with container-first responsive rules and applied UX laws, read-only Slack scraping into LLM-ready markdown, GitHub OSS discovery ranked by polish-days, and installable agent-skill discovery",
-  "version": "1.4.0",
+  "description": "Kargnas' agent skills — AI-ready project setup, VS Code scaffolding, skill authoring/hardening tools, GPT-tell removal, Git-trailer decision context, eight-concept UI/UX design previews, a frontend design baseline with container-first responsive rules and applied UX laws, read-only Slack scraping into LLM-ready markdown, GitHub OSS discovery ranked by polish-days, and installable agent-skill discovery",
+  "version": "1.5.0",
   "author": {
     "name": "Sangrak Choi",
     "email": "kars@kargn.as"
@@ -11,7 +11,7 @@
     "defaultPrompt": [
       "Make this project AI-ready",
       "Remove the GPT tells from this text",
-      "Turn my rough feature idea into global-standard concepts"
+      "Show me several UI/UX concepts before building this"
     ]
   }
 }

@@ -151,11 +151,5 @@
     window.selectedChoice = el.dataset.choice;
   };
 
-  // Expose API for explicit use
-  window.brainstorm = {
-    send: sendEvent,
-    choice: (value, metadata = {}) => sendEvent({ type: 'choice', value, ...metadata })
-  };
-
   connect();
 })();

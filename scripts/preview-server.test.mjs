@@ -11,7 +11,7 @@ import { fileURLToPath } from 'node:url';
 
 test('preview WebSocket authenticates proxy connections without trusting cross-origin cookies', { timeout: 10000 }, async (t) => {
   const dir = await mkdtemp(path.join(tmpdir(), 'preview-server-test-'));
-  const child = spawn(process.execPath, [fileURLToPath(new URL('../skills/dont-trust-my-ui-idea/scripts/server.cjs', import.meta.url))], {
+  const child = spawn(process.execPath, [fileURLToPath(new URL('../skills/ui-buffet/scripts/server.cjs', import.meta.url))], {
     env: {
       ...Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith('BRAINSTORM_'))),
       BRAINSTORM_DIR: dir,
