@@ -11,15 +11,15 @@ The server watches a directory for HTML files and serves the newest one to the b
 ## Starting a Session
 
 ```bash
-# --open auto-opens the browser on the first screen. Invoking this skill is the
-# approval, so always pass it. --project-dir persists mockups and lets a restart
-# reuse the same port.
+# --open auto-opens the browser on the first screen. The user has approved the
+# buffet by this point, so always pass it. --project-dir persists mockups and
+# lets a restart reuse the same port.
 scripts/start-server.sh --project-dir /path/to/project --open
 
 # Returns: {"type":"server-started","port":52341,
 #           "url":"http://localhost:52341/?key=ab12…",
-#           "screen_dir":"/path/to/project/.agents/ai-tasks/dont-trust-my-ui-idea/12345-1706000000/content",
-#           "state_dir":"/path/to/project/.agents/ai-tasks/dont-trust-my-ui-idea/12345-1706000000/state"}
+#           "screen_dir":"/path/to/project/.agents/ai-tasks/ui-buffet/12345-1706000000/content",
+#           "state_dir":"/path/to/project/.agents/ai-tasks/ui-buffet/12345-1706000000/state"}
 ```
 
 Save `screen_dir` and `state_dir` from the response. Share the URL as a fallback too (headless or remote setups will not auto-open).
@@ -30,7 +30,7 @@ Save `screen_dir` and `state_dir` from the response. Share the URL as a fallback
 
 **Finding connection info:** The server writes its startup JSON to `$STATE_DIR/server-info`. If you launched it in the background and lost stdout, read that file.
 
-Pass the project root as `--project-dir` so files land in `.agents/ai-tasks/dont-trust-my-ui-idea/`. Remind the user to add `.agents/ai-tasks/` to `.gitignore` if it is not already there.
+Pass the project root as `--project-dir` so files land in `.agents/ai-tasks/ui-buffet/`. The script writes a `.gitignore` there so session files never reach the project's commits.
 
 **Launching by runtime:**
 
@@ -49,6 +49,7 @@ scripts/start-server.sh --project-dir /path/to/project --host 0.0.0.0 --url-host
 1. **Check the server is alive, then write HTML** to a new file in `screen_dir`:
    - Confirm `$STATE_DIR/server-info` exists and `$STATE_DIR/server-stopped` does not. If it has shut down, restart with `start-server.sh` and the **same `--project-dir`**: it reuses the port, so the open tab reconnects on its own. The server exits after 4 hours idle (`--idle-timeout-minutes`).
    - Use semantic filenames: `concepts.html`, `concepts-v2.html`. **Never reuse a filename.**
+   - Give every concept screen a `<title>` that names what you generated, e.g. `<title>Duo finder matching conditions</title>`. In a fragment, put it first at the top level, not inside a wrapper element; the frame shows it in the browser tab before the brand. In a full document, put it in `<head>`, because the server treats a file as a full document only when it starts with `<!DOCTYPE` or `<html`.
    - Write the file with your file-creation tool. A heredoc dumps the whole HTML into the terminal.
    - The server serves the newest file automatically.
 
@@ -72,11 +73,12 @@ scripts/start-server.sh --project-dir /path/to/project --host 0.0.0.0 --url-host
 
 ## Presenting Concepts
 
-Choose the presentation that makes the design decision clear: cards for compact comparisons, side-by-side mockups for layouts, or full-size screens for detailed inspection. Prefer 2–4 alternatives per comparison and provide navigation across all eight concepts so the user can inspect and revisit them before choosing. Keep each concept's `data-choice` slug stable across views.
+Choose the presentation that makes the design decision clear: cards for compact comparisons, side-by-side mockups for layouts, or full-size screens for detailed inspection. Put all eight concepts in one screen file with in-page navigation (tabs, anchors, or scroll sections) so the user can inspect and revisit them before choosing: the server frames and tracks clicks only on the newest file, and each new file clears the click trail. Write a new file only for a new iteration. Keep each concept's `data-choice` slug stable across views.
 
 For a card comparison, place the mockup inside `.card-image` and the concept name and rationale in `.card-body`:
 
 ```html
+<title>Matchup advice layout</title>
 <h2>Which layout makes matchup advice easier to scan?</h2>
 <p class="subtitle">Compare how each concept presents the opponent and recommended action.</p>
 
@@ -85,7 +87,7 @@ For a card comparison, place the mockup inside `.card-image` and the concept nam
     <div class="card-image"><!-- mockup --></div>
     <div class="card-body">
       <h3>1. My recommendation</h3>
-      <p>Why this fits OP.GG users</p>
+      <p>Why this fits our users</p>
     </div>
   </div>
   <!-- other concepts in this comparison -->
@@ -94,7 +96,8 @@ For a card comparison, place the mockup inside `.card-image` and the concept nam
 
 ## Design Tips
 
-- **Scale fidelity to the question.** Use wireframes for layout and structure; use polished mockups for look and feel, with representative typography, spacing, colors, and assets.
+- **Scale fidelity to the question.** Use wireframes for layout and structure and polished mockups for look and feel. Draw both with the project's design tokens (SKILL.md step 6) and representative assets.
+- **Carry the tokens into the preview.** Mockups inherit the frame's font and colors, and the `.mock-*` elements carry the frame's own borders and corner radius, so set the project's tokens on each mockup and override those elements. Buttons and inputs ignore the inherited font, so give them `font: inherit`. The server serves only files in `screen_dir`, at `/files/<name>`: copy the token values into the screen's `<style>` and any font files they need into `screen_dir`.
 - **Explain the decision on each page.** Ask a specific visual question so the user knows what to compare.
 - **Use real content when it matters.** Representative text, data, and images reveal layout problems that placeholders obscure.
 - **Keep the mockup focused.** Include the detail needed to judge the design question; the frame's mock elements are useful for wireframes.
@@ -166,7 +169,6 @@ Add `data-multiselect` to the container to allow several selections.
 - `h2` page title, `h3` section heading
 - `.subtitle` secondary text below the title
 - `.section` content block with bottom margin
-- `.label` small uppercase label
 
 ## Browser Events Format
 

@@ -87,7 +87,6 @@ const randomPort = () => 49152 + Math.floor(Math.random() * 16383);
 // Prefer an explicit port, else the port this session last bound (so a restart
 // reuses it and an already-open browser tab reconnects), else a random high port.
 function preferredPort() {
-  if (process.env.BRAINSTORM_PORT) return Number(process.env.BRAINSTORM_PORT);
   if (PORT_FILE) {
     try {
       const p = Number(fs.readFileSync(PORT_FILE, 'utf-8').trim());
@@ -122,9 +121,6 @@ function chmodOwnerOnly(file) {
 }
 
 function initialToken() {
-  if (process.env.BRAINSTORM_TOKEN) {
-    return { value: process.env.BRAINSTORM_TOKEN, source: 'env' };
-  }
   if (TOKEN_FILE) {
     try {
       const t = fs.readFileSync(TOKEN_FILE, 'utf-8').trim();
@@ -153,13 +149,13 @@ const MIME_TYPES = {
 function waitingPage() {
   return `<!DOCTYPE html>
 <html>
-<head><meta charset="utf-8"><title>UI Concept Preview</title>
+<head><meta charset="utf-8"><title>UI Buffet</title>
 <style>
 body { font-family: system-ui, sans-serif; padding: 2rem; max-width: 800px; margin: 0 auto; }
 h1 { color: #333; } p { color: #666; }
 </style>
 </head>
-<body><h1>UI Concept Preview</h1>
+<body><h1>UI Buffet</h1>
 <p>Waiting for the agent to push a screen...</p></body></html>`;
 }
 
@@ -177,7 +173,7 @@ function bootstrapPage(key) {
   const jsonKey = JSON.stringify(String(key));
   return `<!DOCTYPE html>
 <html>
-<head><meta charset="utf-8"><title>Opening UI Concept Preview</title></head>
+<head><meta charset="utf-8"><title>Opening UI Buffet</title></head>
 <body>
 <script>
 try { sessionStorage.setItem('brainstorm-session-key', ${jsonKey}); } catch (e) {}
@@ -199,7 +195,7 @@ function isFullDocument(html) {
 }
 
 function wrapInFrame(content) {
-  return frameTemplate.replace('<!-- CONTENT -->', content);
+  return frameTemplate.replace('<!-- CONTENT -->', () => content);
 }
 
 function getNewestScreen() {
@@ -277,14 +273,8 @@ function parseCookies(header) {
 // A request is authorized if it carries the session key as ?key= or as the
 // session cookie. Both are compared in constant time.
 function isAuthorized(req) {
-  const q = req.url.indexOf('?');
-  if (q >= 0) {
-    const params = new URLSearchParams(req.url.slice(q + 1));
-    if (params.has('key')) {
-      const key = params.get('key');
-      return Boolean(key && timingSafeEqualStr(key, TOKEN));
-    }
-  }
+  const key = queryKey(req.url);
+  if (key !== null) return Boolean(key && timingSafeEqualStr(key, TOKEN));
   const cookie = parseCookies(req.headers['cookie'])[COOKIE_NAME];
   if (cookie && timingSafeEqualStr(cookie, TOKEN)) return true;
   return false;
@@ -466,21 +456,16 @@ function broadcast(msg) {
 
 // Best-effort: open the user's browser the first time a screen is actually ready
 // to show. Skips when disabled, on a non-loopback (remote) bind, or when a
-// browser is already connected. Override the launcher with BRAINSTORM_OPEN_CMD.
+// browser is already connected.
 let browserOpened = false;
 function maybeOpenBrowser() {
   if (browserOpened) return;
   browserOpened = true;
-  if (!process.env.BRAINSTORM_OPEN) return; // opt-in: only after the user approves the companion
+  if (!process.env.BRAINSTORM_OPEN) return; // opt-in: set by start-server.sh --open, which the skill passes only after the user approved the buffet
   if (HOST !== '127.0.0.1' && HOST !== 'localhost') return;
   if (clients.size > 0) return; // the user already opened it
   const url = companionUrl(); // must carry the key or the gate 403s it
   const cp = require('child_process');
-  // Operator-provided launcher: run as given (this env var is trusted operator input).
-  if (process.env.BRAINSTORM_OPEN_CMD) {
-    try { cp.exec(process.env.BRAINSTORM_OPEN_CMD + ' ' + JSON.stringify(url), () => {}); } catch (e) { /* best effort */ }
-    return;
-  }
   // Platform launchers: pass the URL as an argv element via execFile (no shell),
   // so a url-host containing shell metacharacters can't inject a command.
   const launcher = browserLauncherForPlatform(url);
@@ -496,12 +481,8 @@ const IDLE_TIMEOUT_MS = (() => {
   const ms = Number(process.env.BRAINSTORM_IDLE_TIMEOUT_MS);
   return Number.isFinite(ms) && ms > 0 ? ms : 4 * 60 * 60 * 1000;
 })();
-// How often the watchdog checks for owner-death / idleness. Configurable mainly
-// so tests can run fast; production default is 60s.
-const LIFECYCLE_CHECK_MS = (() => {
-  const ms = Number(process.env.BRAINSTORM_LIFECYCLE_CHECK_MS);
-  return Number.isFinite(ms) && ms > 0 ? ms : 60 * 1000;
-})();
+// How often the watchdog checks for owner-death / idleness.
+const LIFECYCLE_CHECK_MS = 60 * 1000;
 let lastActivity = Date.now();
 
 function touchActivity() {
@@ -631,10 +612,6 @@ function startServer() {
 
   server.on('error', (err) => {
     if (err.code === 'EADDRINUSE' && !triedFallback) {
-      if (tokenSource === 'env') {
-        console.error('Server failed to bind: preferred port is in use and BRAINSTORM_TOKEN is set; refusing fallback with explicit token');
-        process.exit(1);
-      }
       triedFallback = true;
       PORT = randomPort();
       if (tokenSource === 'file') {
