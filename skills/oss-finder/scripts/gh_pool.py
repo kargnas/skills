@@ -2,7 +2,8 @@
 """
 gh_pool.py — GitHub REST helper using a rotating PAT pool.
 
-Loads PATs from ~/.config/kargnas/oss-finder.env (one PAT per GitHub account;
+Loads PATs from ~/.config/kargnas/skill-finder.env and
+~/.config/kargnas/oss-finder.env, merging both (one PAT per GitHub account;
 3 accounts = 90 req/min on the Search API, 5000 req/h core per token).
 GH_PAT_<n> environment variables extend the pool.
 
@@ -44,7 +45,13 @@ try:
 except Exception:
     _SSL_CONTEXT = ssl.create_default_context()
 
-PAT_CONFIG_FILE = Path.home() / ".config" / "kargnas" / "oss-finder.env"
+# skill-finder runs its GitHub sweep through this module, so one pool serves
+# both skills and PATs may live in either skill's env file. Both are read and
+# merged; a PAT present in both files is used once.
+PAT_CONFIG_FILES = (
+    Path.home() / ".config" / "kargnas" / "skill-finder.env",
+    Path.home() / ".config" / "kargnas" / "oss-finder.env",
+)
 PAT_ENV_PREFIX = "GH_PAT_"
 PAT_META_SUFFIXES = ("_OWNER", "_EMAIL")
 
@@ -54,16 +61,18 @@ PAT_META_SUFFIXES = ("_OWNER", "_EMAIL")
 SETUP_HINT = f"""\
 [oss-finder] No GitHub PATs loaded — the PAT pool is not configured.
   1. Create one PAT per GitHub account (public search needs only public-repo read access).
-  2. Write them to {PAT_CONFIG_FILE} as GH_PAT_1=..., GH_PAT_2=... and chmod 600 the file.
+  2. Write them to {' or '.join(map(str, PAT_CONFIG_FILES))} as GH_PAT_1=..., GH_PAT_2=... and chmod 600 the file.
   3. Re-run: python3 {Path(__file__).name} --check
   See SKILL.md "Step 0" for the full setup."""
 
 
 def load_pats() -> list[str]:
-    """Load PATs from the config file, then from GH_PAT_<n> env vars."""
+    """Load PATs from every existing config file, then from GH_PAT_<n> env vars."""
     pats: list[str] = []
-    if PAT_CONFIG_FILE.exists():
-        for line in PAT_CONFIG_FILE.read_text().splitlines():
+    for config_file in PAT_CONFIG_FILES:
+        if not config_file.exists():
+            continue
+        for line in config_file.read_text().splitlines():
             line = line.strip()
             if not line or line.startswith("#") or "=" not in line:
                 continue
@@ -109,7 +118,8 @@ def check_setup() -> int:
     """
     ok = True
     if _PATS:
-        print(f"[oss-finder] PATs loaded: {len(_PATS)} (from {PAT_CONFIG_FILE} + GH_PAT_* env)")
+        found = [str(f) for f in PAT_CONFIG_FILES if f.exists()]
+        print(f"[oss-finder] PATs loaded: {len(_PATS)} (from {' + '.join(found + ['GH_PAT_* env'])})")
     else:
         print(SETUP_HINT)
         ok = False

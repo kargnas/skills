@@ -28,7 +28,7 @@ Both bundled scripts refuse to run without PATs (they print the same setup hint 
 
 | Constant | Value | Purpose |
 |---|---|---|
-| `PAT_CONFIG_FILE` | `~/.config/kargnas/oss-finder.env` | Local GitHub PAT pool read by `scripts/gh_pool.py`. Keep it untracked. |
+| `PAT_CONFIG_FILES` | `~/.config/kargnas/skill-finder.env`, `~/.config/kargnas/oss-finder.env` | Local GitHub PAT pool files read by `scripts/gh_pool.py`. Both are read and merged (a PAT in both counts once), so either file works. Keep them untracked. |
 
 ```bash
 mkdir -p ~/.config/kargnas
