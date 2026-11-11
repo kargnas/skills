@@ -32,7 +32,7 @@ Assume a mature codebase with years of history unless the project shows otherwis
    5. A devil's advocate approach
    6. The standard approach Korean developers or designers would use (but it doesn't mean the characters should be in Korean)
    7. The standard approach Chinese developers or designers would use (but it doesn't mean the characters should be in Chinese)
-   8. The Fresh Eyes concept from the clean-context subagent (see `## The Fresh Eyes concept`).
+   8. The Fresh Eyes concept from the clean-context subagent (see `## The Fresh Eyes concept`). When that section reports it missing, leave it out and show the other seven.
 
    Draw every concept with the project's design tokens from step 2:
    - The tokens never change, however far a concept departs from the design rules: borders, fonts, corner radius, and every other token value stay exactly as the project defines them.
