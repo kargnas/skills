@@ -22,7 +22,7 @@ Assume a mature codebase with years of history unless the project shows otherwis
    - Example with a timer (translate as needed): `UI Buffet can show eight design concepts in your browser before anything is built. It takes about 5–10 minutes, but I strongly recommend it: you see the industry and global standard approaches next to UIs you might never have imagined. Shall I run it? If I don't hear back in 5 minutes, I'll continue without it.`
 2. **Explore project context.** First read the project's design rules and design tokens, for example a `DESIGN.md`, a design-system doc, a Tailwind theme, CSS custom properties, or a tokens JSON, plus any design guidance the project's agent instructions point to. If the project has none, say so, infer the tokens from its existing UI, and state what you assumed; do not create a design file unless the user asks. Then read the files, docs, and recent commits around the surface being changed so the concepts fit the existing flow.
 3. **Clarify only if the capability itself is ambiguous.** One question per message, multiple choice when possible. Do not ask about scope, token cost, or whether to open the preview.
-4. **Start the clean-context subagent** for concept 8 in the background (see `## The Fresh Eyes concept`), then go straight to step 5. Concepts 1-7 do not depend on its answer, so never wait for it before drafting them; read the answer when you draw concept 8, and wait only then if it is still running.
+4. **Start the clean-context subagent** for concept 8 in the background (see `## The Fresh Eyes concept`), then go straight to step 5. Concepts 1-7 do not depend on its answer, so draft them while it runs, outside `screen_dir`. Write the screen file once, after concept 8 is drawn or reported missing; that is the only point where you wait for the subagent.
 5. **Start the browser preview** with `scripts/start-server.sh --project-dir <project root> --open` and follow `references/visual-companion.md`. Reaching this step is the approval: never ask before opening it, never mention token cost, and prefer an HTML preview over ASCII.
 6. **Create eight distinct UI/UX concepts** (override the count only if the user asks for a specific number). Match the preview's fidelity and presentation to the design question using `references/visual-companion.md`, and make every concept available for comparison before the user chooses. Give the screen a `<title>` that names what you generated so the browser tab shows it; `references/visual-companion.md` says where it goes. Label each concept card with a badge counting the clicks and inputs needed to finish the main task (e.g. `3 clicks · 1 input`):
    1. Your own recommendation
@@ -51,16 +51,21 @@ You send the subagent ONE goal sentence followed by this fixed line, and nothing
 
 `Answer in plain text with one concept. Do not read, search, or write any files.`
 
-Sending only that prompt does not make the context clean: a subagent can still inherit your conversation, and a runtime can load the project's agent instructions, such as `AGENTS.md`, into a subagent that received nothing else. Start the subagent so that all of these hold:
+Sending only that prompt does not make the context clean: a subagent can still inherit your conversation, and a runtime can load the agent instructions, such as `AGENTS.md`, of the directory it starts in or of any parent directory into a subagent that received nothing else. Start the subagent so that all of these hold:
 
 - It receives none of your conversation.
-- It starts in a new empty temporary directory outside the project, so it loads no project instruction file.
-- It runs in the background and saves its answer where you can read it later (step 4).
-- It runs below the maximum reasoning effort, so its answer is ready by the time concepts 1-7 are drafted.
+- It starts in a new empty directory under the system temporary directory, so no project instruction file sits in that directory or above it.
+- It runs in the background under a 10-minute time limit, with its output redirected to a file in that directory.
 
-A fresh agent CLI process started in the background from that empty directory meets all four. Use another subagent mechanism only if it meets all four as well.
+A fresh agent CLI process started in the background from that directory meets all three. Use another subagent mechanism only if it meets all three as well. If your runtime lets you set the reasoning effort, keep it below the maximum so the answer arrives while you draft concepts 1-7.
 
-Before you draw the concept, check the answer for anything the prompt did not give it: file paths, repository or project names, project rules, or details of the current UI. Any of these means the context leaked, so discard the answer and start the subagent again with all four conditions met.
+When the run ends, read the answer and delete the directory. Check the answer for anything the prompt did not give it: file paths, repository or project names, project rules, or details of the current UI. User-level agent instructions can still reach a fresh process, so such content can come from them as well as from the project.
+
+Start one more run from a new empty directory if the answer shows such content, or if the run fails or returns nothing before its time limit. Draw no concept 8 when any of the following happens; tell the user in one line that the Fresh Eyes concept is missing and why, and show the other seven:
+
+- The second run also shows such content, fails, or returns nothing.
+- A run reaches its 10-minute limit.
+- Nothing you can start meets all three conditions.
 
 How to build the goal sentence:
 
