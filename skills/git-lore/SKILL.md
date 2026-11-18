@@ -1,6 +1,6 @@
 ---
 name: git-lore
-description: Captures, queries, and configures decision context in native Git trailers. Use for non-trivial commit messages, constraints, rejected alternatives, directives, test gaps, Lore history queries, or installing Lore rules in project or global agent instructions.
+description: Captures, queries, and configures decision context in native Git trailers. Use before every non-trivial git commit (커밋) or commit message draft, even if Lore is not mentioned; also for Lore history queries (constraints, rejected alternatives, directives, test gaps) or installing Lore rules in agent instructions.
 ---
 
 # Git Lore
@@ -19,7 +19,7 @@ Repository instructions remain authoritative. Lore supplements existing commit-m
 
 ## Commit Mode
 
-1. Inspect the staged diff and the verified work from the current task. If nothing is staged, stop and report it; do not stage files unless the user authorized staging them. Never stage unrelated files.
+1. Inspect the staged diff and the verified work from the current task. When nothing is staged, stage only the files the user authorized for this commit; if the user authorized none, stop and report it. Never stage unrelated files.
 2. Write the summary and body in the repository's required format.
    If none exists, use a locale-appropriate summary that names the resulting
    change: an imperative phrase in English. (or a concise noun phrase in Korean if the user or other rules explicitly want to write in Korean)
