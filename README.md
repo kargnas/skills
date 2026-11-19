@@ -113,7 +113,7 @@ npx -y skills add kargnas/skills --skill slack-api-readonly
 
 ### `oss-finder`
 
-GitHub에서 라이브러리, 프레임워크, CLI 도구, 코드를 찾아 스타 수 대신 README를 사람이 손으로 다듬은 날짜 수(polish-days)로 순위를 매깁니다. 회전 PAT 풀, grep.app, Blackbird 웹 인덱스, BigQuery/GHArchive 백엔드와 코드 검색 폴백 체인을 함께 제공하며, `gh search code`가 레이트 리밋에 걸릴 때도 씁니다. 실행할 때마다 PAT 풀 설정을 먼저 확인하고, 없으면 멈춰서 설정 방법을 안내합니다.
+GitHub에서 라이브러리, 프레임워크, CLI 도구, 코드를 찾아 스타 수 대신 README를 사람이 손으로 다듬은 날짜 수(polish-days)로 순위를 매깁니다. 회전 PAT 풀, grep.app, Blackbird 웹 인덱스, BigQuery/GHArchive 백엔드와 코드 검색 폴백 체인을 함께 제공하며, `gh search code`가 레이트 리밋에 걸릴 때도 씁니다. 실행할 때마다 PAT 풀 설정을 먼저 확인하고, 없으면 멈춰서 설정 방법을 안내합니다. PAT 풀은 설정 파일의 PAT와 함께, gh가 `hosts.yml`에 저장해 둔 로그인 토큰(`gh-profile` 프로필 포함)도 계정마다 하나씩 씁니다.
 
 ```bash
 npx -y skills add kargnas/skills --skill oss-finder

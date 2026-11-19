@@ -5,6 +5,9 @@ gh_pool.py — GitHub REST helper using a rotating PAT pool.
 Loads PATs from ~/.config/kargnas/skill-finder.env and
 ~/.config/kargnas/oss-finder.env, merging both (one PAT per GitHub account;
 3 accounts = 90 req/min on the Search API, 5000 req/h core per token).
+gh's own logins join the pool too: ~/.config/gh/hosts.yml and each
+~/.config/gh/<profile>/hosts.yml, one token per GitHub login, when gh kept the
+token in that file instead of the system keyring.
 GH_PAT_<n> environment variables extend the pool.
 
 Usage as library:
@@ -24,6 +27,8 @@ from __future__ import annotations
 import itertools
 import json
 import os
+import re
+import shutil
 import subprocess
 import sys
 import threading
@@ -54,6 +59,10 @@ PAT_CONFIG_FILES = (
 )
 PAT_ENV_PREFIX = "GH_PAT_"
 PAT_META_SUFFIXES = ("_OWNER", "_EMAIL")
+# gh's default config dir. Our machines also keep one ~/.config/gh/<profile>/
+# per GitHub account, which the gh-profile wrapper selects through
+# GH_CONFIG_DIR; plain gh knows nothing of these subdirectories.
+GH_CONFIG_ROOT = Path.home() / ".config" / "gh"
 
 # Printed whenever the pool is empty. The scripts refuse to run without PATs
 # instead of degrading to anonymous requests (60 req/h), which cannot finish a
@@ -62,12 +71,54 @@ SETUP_HINT = f"""\
 [oss-finder] No GitHub PATs loaded — the PAT pool is not configured.
   1. Create one PAT per GitHub account (public search needs only public-repo read access).
   2. Write them to {' or '.join(map(str, PAT_CONFIG_FILES))} as GH_PAT_1=..., GH_PAT_2=... and chmod 600 the file.
+     A gh login whose token gh keeps in {GH_CONFIG_ROOT}/hosts.yml or {GH_CONFIG_ROOT}/<profile>/hosts.yml counts too.
   3. Re-run: python3 {Path(__file__).name} --check
   See SKILL.md "Step 0" for the full setup."""
 
 
+def hosts_account(text: str) -> tuple[str | None, str | None]:
+    """(login, token) of the active github.com account in a gh hosts.yml.
+
+    gh writes the active account's `user` and `oauth_token` at the host's own
+    level and repeats each signed-in user's token deeper, in the `users:` map.
+    A token kept in the system keyring is not in the file: token is None then.
+    """
+    host = re.search(r"^github\.com:\n((?:[ \t]+\S.*\n?)*)", text, re.M)
+    if not host:
+        return None, None
+    login = re.search(r"^ {4}user:[ \t]*(\S+)", host[1], re.M)
+    token = re.search(r"^ {4}oauth_token:[ \t]*(\S+)", host[1], re.M)
+    return (login[1] if login else None), (token[1] if token else None)
+
+
+def gh_tokens(root: Path = GH_CONFIG_ROOT) -> list[tuple[Path, str]]:
+    """(hosts.yml, token) per GitHub login gh is signed in to under root.
+
+    Tokens of one login share its rate limits, so only its first token joins:
+    a second would let a retry land on the same exhausted quota.
+    """
+    found: list[tuple[Path, str]] = []
+    logins: set[str] = set()
+    for hosts in [root / "hosts.yml", *sorted(root.glob("*/hosts.yml"))]:
+        if not hosts.exists():
+            continue
+        login, token = hosts_account(hosts.read_text())
+        if token and (login or token) not in logins:
+            logins.add(login or token)
+            found.append((hosts, token))
+    return found
+
+
+def gh_profiles() -> list[str]:
+    """Signed-in profiles of the gh-profile wrapper, or [] where it is not installed."""
+    if not shutil.which("gh-profile"):
+        return []
+    r = subprocess.run(["gh-profile", "--list"], capture_output=True, text=True, timeout=15, check=True)
+    return json.loads(r.stdout)
+
+
 def load_pats() -> list[str]:
-    """Load PATs from every existing config file, then from GH_PAT_<n> env vars."""
+    """Load PATs from every existing config file, gh's own logins, then GH_PAT_<n> env vars."""
     pats: list[str] = []
     for config_file in PAT_CONFIG_FILES:
         if not config_file.exists():
@@ -81,6 +132,11 @@ def load_pats() -> list[str]:
             if k.startswith(PAT_ENV_PREFIX) and not k.endswith(PAT_META_SUFFIXES):
                 if (v.startswith("github_pat_") or v.startswith("ghp_")) and v not in pats:
                     pats.append(v)
+    # ponytail: an env-file PAT names no login, so a login that is also signed
+    # in to gh takes two slots; resolve logins through GET /user if that matters.
+    for _, token in gh_tokens():
+        if token not in pats:
+            pats.append(token)
     # Env vars override / extend
     for k, v in os.environ.items():
         if k.startswith(PAT_ENV_PREFIX) and not k.endswith(PAT_META_SUFFIXES) and v:
@@ -115,10 +171,11 @@ def check_setup() -> int:
 
     The bundled scripts only need the pool; the inline `gh search` / `gh api`
     steps in SKILL.md need an authenticated gh CLI, so both are checked here.
+    gh counts as ready when plain gh is signed in or gh-profile has profiles.
     """
     ok = True
     if _PATS:
-        found = [str(f) for f in PAT_CONFIG_FILES if f.exists()]
+        found = [str(f) for f in PAT_CONFIG_FILES if f.exists()] + [str(h) for h, _ in gh_tokens()]
         print(f"[oss-finder] PATs loaded: {len(_PATS)} (from {' + '.join(found + ['GH_PAT_* env'])})")
     else:
         print(SETUP_HINT)
@@ -127,6 +184,11 @@ def check_setup() -> int:
         r = subprocess.run(["gh", "auth", "status"], capture_output=True, text=True, timeout=15)
         if r.returncode == 0:
             print("[oss-finder] gh CLI: authenticated")
+        elif profiles := gh_profiles():
+            # Where plain gh is signed in to no account on purpose (the cumora
+            # computer), every gh command runs through `gh-profile <profile>`.
+            print("[oss-finder] gh CLI: no default login; run the inline `gh` steps as "
+                  f"`gh-profile <profile> gh ...` (signed-in profiles: {', '.join(profiles)})")
         else:
             print("[oss-finder] gh CLI: not authenticated — run `gh auth login` "
                   "(the inline `gh search` / `gh api` steps need it)")
