@@ -19,16 +19,17 @@ python3 scripts/gh_pool.py --check
 
 | Exit | Meaning | What to do |
 |---|---|---|
-| `0` (`READY`) | PAT pool loaded AND `gh` CLI authenticated | Continue. |
+| `0` (`READY`) | PAT pool loaded AND `gh` CLI authenticated (plain `gh`, or the signed-in `gh-profile` profiles it lists) | Continue. |
 | `1` (`SETUP NEEDED`) | PAT pool missing, and/or `gh` not logged in | **STOP. Do not run any search.** Tell the user exactly what is missing and ask whether to set it up now. Walk them through the setup below, re-run the check, and continue only on exit `0`. |
 
-Both bundled scripts refuse to run without PATs (they print the same setup hint and exit `2`). There is no anonymous or `gh`-CLI-only path: anonymous GitHub search (60 req/h) cannot finish a single polish-day sweep.
+Both bundled scripts refuse to run without PATs (they print the same setup hint and exit `2`). There is no anonymous path: anonymous GitHub search (60 req/h) cannot finish a single polish-day sweep. A `gh` login feeds the pool only when gh keeps its token in a `hosts.yml` file (`GH_CONFIG_ROOT` below), not in the system keyring.
 
 ### PAT pool setup
 
 | Constant | Value | Purpose |
 |---|---|---|
 | `PAT_CONFIG_FILES` | `~/.config/kargnas/skill-finder.env`, `~/.config/kargnas/oss-finder.env` | Local GitHub PAT pool files read by `scripts/gh_pool.py`. Both are read and merged (a PAT in both counts once), so either file works. Keep them untracked. |
+| `GH_CONFIG_ROOT` | `~/.config/gh` | gh's own logins also join the pool: `hosts.yml` there and in each `<profile>/` subdirectory, the per-account layout the `gh-profile` wrapper selects through `GH_CONFIG_DIR`. Only one token per GitHub login joins, because one login's tokens share a quota. |
 
 ```bash
 mkdir -p ~/.config/kargnas
@@ -42,7 +43,7 @@ chmod 600 ~/.config/kargnas/oss-finder.env
 1. Create 1–5 PATs. Public search needs only public-repository read access (`public_repo` on classic tokens).
 2. Each PAT must come from a **different GitHub account** — same-account PATs share one quota. Every account adds 30 req/min on the Search API (3 accounts ⇒ 90 req/min). Keep account-ownership notes as comments in the file, not in this skill.
 3. `GH_PAT_<n>` environment variables extend the pool at runtime.
-4. `gh auth login` is still required for the inline `gh search` / `gh api` steps below (5000 req/h core quota vs 60 anonymous).
+4. `gh auth login` is still required for the inline `gh search` / `gh api` steps below (5000 req/h core quota vs 60 anonymous). Where plain `gh` has no login on purpose but the `gh-profile` wrapper has signed-in profiles (the cumora computer), Step 0 passes and lists those profiles: run each inline `gh` step as `gh-profile <profile> gh ...`.
 5. Verify: `python3 scripts/gh_pool.py /rate_limit` prints the current PAT's quota; repeated calls rotate PATs.
 
 ## Why polish-days, not stars or install counts
@@ -192,7 +193,7 @@ When `gh search code` rate-limits (30 req/min hard cap, NOT raised by paid plans
 
 ## Constraints
 
-- MUST run Step 0 (`scripts/gh_pool.py --check`) before any backend or script; on `SETUP NEEDED`, MUST stop and ask the user to set up the PAT pool / `gh auth login` instead of searching without it.
+- MUST run Step 0 (`scripts/gh_pool.py --check`) before any backend or script; on `SETUP NEEDED`, MUST stop and ask the user to set up the PAT pool / `gh auth login` instead of searching without it. When Step 0 lists `gh-profile` profiles, MUST run every inline `gh` command as `gh-profile <profile> gh ...`.
 - MUST launch GH-API/GH-WEB/GREP-APP/PAT-POOL in parallel (async) at the start of an exhaustive discovery request, union their results, and report each backend's raw count before any candidate table.
 - MUST NOT silent-skip a backend whose key/cookie/auth is missing — tell the user what is missing and collect it.
 - MUST use authenticated `gh` (5000 req/h vs 60 anonymous) and collapse same-UTC-day commits to 1 polish day.
