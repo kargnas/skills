@@ -3,7 +3,7 @@ name: design-frontend-sangrak
 description: Use when starting frontend work in a project with no existing design system, when building or theming UI with shadcn/ui or Tailwind CSS, or when asked to review/audit web UI. Default design baseline for new screens, plus container-first responsive rules, URL-first routing, scoped async loading, theme/i18n defaults, and applied UX laws.
 metadata:
   author: kargnas
-  version: "0.9.1"
+  version: "0.10.0"
   argument-hint: <file-or-pattern>
 ---
 
@@ -23,6 +23,8 @@ Two modes, both grounded in the same design system below:
 
 - **Build mode** — writing/editing UI code: apply the design system directly.
 - **Review mode** — asked to review/audit UI: check code against the design system AND the fetched Vercel guidelines, output findings as terse `file:line` entries.
+
+Before building or reviewing any of these, MUST read [references/component-policies.md](references/component-policies.md) for their counts, behavior, and copy limits: badges, dialogs, sheets, side panels, button rows, tabs, back and close navigation, pagination, selection controls (select, radio, checkbox, switch, chips, segmented control, slider, stepper), date and time pickers, forms, lists, cards, images, accordions, dividers, empty and result screens, and icons.
 
 For transitions, animation, or motion-token work, MUST read and follow the bundled [Transitions.dev guide](sub-skills/transitions-dev/GUIDE.md). This design system wins when its visual, accessibility, review-output, or mutation rules conflict with the bundled guide.
 
@@ -53,6 +55,9 @@ Generated components are project code. Bring them onto this system before using 
 | `p-6` (Sheet, Empty), card `--spacing(5)` or more (Vega, Rhea) | `p-4`, `--spacing(4)` |
 | `Kbd` with `font-sans` and no border | The badge style in Keyboard hints |
 | `data-active:bg-sidebar-accent` on `SidebarMenuButton` | `data-active:bg-primary/10 dark:data-active:bg-primary/14` |
+| `active:not-aria-[haspopup]:translate-y-px` on `Button` | The press feedback in Interaction & Accessibility |
+| `AlertDialogCancel` defaulting to `variant = "outline"` | `variant = "secondary"`, because outline pairs only with outline |
+| `showOutsideDays = true` in `Calendar` | `showOutsideDays = false`, so days of other months stay blank |
 
 ## Design System
 
@@ -113,8 +118,13 @@ New projects adopt these values as-is; existing projects with their own tokens k
 
 ### Status colors
 
-- live/streaming = emerald, neutral/ok = `text-muted-foreground`, error/failure = `destructive`.
-- Quota/progress bars add amber for the 20–50% remaining band.
+One status vocabulary for every component (badge, field, toast, chart):
+
+- critical (error, failure, rejected, failed check) = `destructive`.
+- warning (expiring soon, missing submission) = amber. Quota/progress bars use amber for the 20-50% remaining band.
+- live/streaming = emerald.
+- neutral, ok, and informative (beta, limited permission) = `text-muted-foreground`. Positive results (saved, approved, published) count as ok.
+- AI features and AI-generated content carry one marker everywhere, including their loading and notice states: the same icon from the project's icon set plus an `AI` label, with no extra color.
 
 ### Density scale
 
@@ -160,6 +170,10 @@ New projects adopt these values as-is; existing projects with their own tokens k
 - A router or network request does not by itself justify a page loader. Whole-page initialization is reserved for the first load when no stable shell or useful content can render. Never subscribe a page to every router/network start event and swap the entire page for a spinner.
 - Show pending feedback (`Spinner`) at the initiating control or inside the affected region, mark that region with `aria-busy`, and disable only controls that would conflict with the in-flight request.
 - Request only the data the interaction invalidates (`only` for Inertia, a scoped query key, or the framework equivalent). When stale data must disappear, replace only that region and preserve its approximate size to avoid layout shifts.
+- Long waits escalate after the 400ms delay in UX Laws. After 4s, add a status line that says what is happening. After 10s, show determinate progress and an estimate when the task reports progress. After 1 minute, offer to continue in the background and to cancel.
+- A wait that can hang (fetching location, external verification) gets a timeout that ends in an error with a retry.
+- `Skeleton` (first load only, as in UX Laws) fits a known layout, such as repeated lists and fixed layouts, and matches the real content's size, line height, and radius. `Spinner` fits an unknown layout, saves, and partial refreshes. One region never shows both.
+- A plain data load needs no success message; the data is the result.
 
 ### Theme & Language
 
@@ -188,8 +202,8 @@ One decision rule per law plus the code smell that violates it. No theory — on
 ## Anti-slop (never do this)
 
 - **No left accent border** on cards, rows, or nav items — ever, on any page.
-- No drop shadows beyond `shadow-card` (dark mode has none at all).
-- No gradients, no decorative icons beyond the project's icon set (`components.json#iconLibrary`).
+- No drop shadows beyond `shadow-card` (dark mode has none at all). A sticky header over scrolling content separates with a hairline (`border-b`), not a shadow.
+- No gradient fills (backgrounds, text, borders), no decorative icons beyond the project's icon set (`components.json#iconLibrary`).
 - shadcn `Chart` (Recharts) for multi-series dashboards; inline SVG only for sparklines.
 - No new font sizes, weights, or spacing values outside the scale above.
 - Margin/padding must be consistent with sibling components of the same purpose; misaligned spacing is a bug, not a nit.
@@ -205,12 +219,49 @@ One decision rule per law plus the code smell that violates it. No theory — on
 ## Interaction & Accessibility (required, not optional)
 
 - Every interactive element has BOTH a visible focus ring (shadcn's `focus-visible:ring-*` + `focus-visible:ring-ring/*` pair) and a `hover:` state. `outline-none`/`outline-hidden` without a visible focus replacement is forbidden.
+- Press feedback changes only the surface color, never the text or icon color. `active:` reuses the variant's hover surface instead of a new color, and ghost elements get that surface too, so a mouse user sees one style on hover and on press.
+- An element whose color already means its state (`Switch`, a selected tab or chip) shows a press by scale only.
+- Press scale moves a fixed 2px, not a fixed ratio: `scale = (basis - 2) / basis`, where `basis = max(height, width / 4, 24)` in px. A 32×32 icon button presses to `scale-[0.938]` and a 120×48 button to `scale-[0.958]`. Color and scale share one transition (Tailwind's default `transition`, 150ms) and start together.
+- Only the pressed element shrinks. A checkbox inside a shrinking row doesn't shrink on its own, and a card with several equal actions (open, like, save) lets only the pressed button react. Loading and disabled elements don't shrink, and `motion-reduce:` drops the scale but keeps the color change.
+- A loading button ignores repeat activation. It stays enabled only when a click must still do something during loading (cancel, stop); otherwise it is disabled.
 - Long-text containers get `wrap-break-word` (`wrap-anywhere` in table cells, where `break-word` cannot shrink the column); flex/grid children that hold text get `min-w-0` (the classic invisible-overflow bug).
 - `transition-all` is forbidden — name the transitioned properties (`transition-colors`, `transition-opacity`). Respect `motion-reduce:`.
 - Tap targets get `touch-manipulation`.
 - Every clickable element shows `cursor-pointer` — buttons, links styled as buttons, clickable rows/cards/list items, tabs, chips, icon buttons. Tailwind v4 Preflight sets `cursor: default` on `<button>`, so `<button>` is NOT exempt: `init --pointer` writes the base rule (`button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer }`); a project created without it adds the rule once, or the class per element. Disabled controls get `cursor-not-allowed`; text inputs keep the I-beam.
 - Every screen is usable on mobile web (375px wide, touch, no hover): tap targets are at least 44×44px under touch (`pointer-coarse:min-h-11`, dense table rows included — Mira ships 28px controls), nothing is hover-only — an action revealed on `hover:` is also always visible on touch (`pointer-coarse:opacity-100`) or reachable from a tap menu, and horizontal scroll lives only inside tables/code (`overflow-x-auto` on that container), never on the page. Check 375px before calling a screen done.
+- On every pointer, a target is at least 24×24px. A small icon or a control drawn smaller gets a larger hit area, not a larger glyph.
+- Every pinch or drag action also works with a tap or a click.
+- Color never carries information alone: pair it with text or an icon (status, errors, chart series).
+- Color pairs outside the theme table (status, chart, and new semantic colors) meet APCA contrast: Lc 75 (90 preferred) for body text, titles, input values, and tooltips; Lc 60 for other text; Lc 30 for placeholder and disabled text.
+- A one-shot animation (not a loading indicator) stays under 2s or offers a skip. Nothing flashes more than 3 times per second. Media doesn't autoplay by default; media that must autoplay starts muted, and sound that plays longer than 3s gets a pause, stop, or volume control.
+- Errors and status changes that appear in place are announced: `FieldError` has `role="alert"`, and other async results go in an `aria-live` region.
+- Enlarged text (browser zoom, OS text size) wraps instead of clipping, and button rows stack.
 - Decorative elements get `aria-hidden`.
+
+## UI Copy
+
+These rules hold in every language. A `한국어의 경우:` line adds the Korean form.
+
+- Use plain, familiar words: a verb over a nominalized phrase (`Can't message this person`, not `Messaging is unavailable`).
+  - 한국어의 경우: prefer native words to Sino-Korean nouns ('대화할 수 없어요', not '대화가 불가능합니다').
+- Name the user's action and lead with the result, not the data processing (`Review sent`, not `Review submission completed`).
+- Name the purpose, not the feature (`Trade via chat`, not `Chat`; `You liked this comment`, not `You pressed Like on this comment`).
+- Use the official feature name, never the users' shorthand.
+  - 한국어의 경우: '끌어올리기', not '끌올'.
+- Phrase positively and avoid double negatives (`You can change this once a month`, not `You can't change this more than once a month`; `Upload complete`, not `Upload didn't fail`).
+- Use active voice by default, and passive only when it carries the meaning better, such as when the actor is unknown or irrelevant.
+  - 한국어의 경우: no double passive ('보이는', not '보여지는').
+- One idea per sentence. Use an exclamation mark only when needed, and never repeat it.
+- An error says how to fix it (`The service is temporarily unavailable. Try again in a moment.`, not `Server error`).
+- Write counts as numerals (`1 item`).
+  - 한국어의 경우: '1개', not '한 개'.
+- 한국어의 경우: default to '-요' endings and use the honorific '-시-' only when needed ('등록할 수 있어요', not '등록하실 수 있어요'). Automated messages that call for care use '-니다'.
+- Statements and instructions end with a period. Titles, headings, KPI numbers, buttons, menu items, and labels take none. A one-sentence toast has no period; when a toast has two or more sentences, every sentence gets one.
+- A button that answers yes or no puts a comma after the answer (`Yes, delete`).
+  - 한국어의 경우: '네, 삭제할게요'.
+- 한국어의 경우: a feature name or status value is written as one word ('예약중'), and the same words in a sentence are spaced ('예약 중일 때는 채팅할 수 없어요').
+- Every label fits on one line without truncation: menu items, tags, badges (2-3 words), toast actions (1-2 words), and bottom tabs (10 Latin characters). A selectable card's description takes at most 2 lines.
+  - 한국어의 경우: menu items take 2-6 characters, tags 6-10, and bottom tabs 5.
 
 ## Review Mode
 
@@ -221,7 +272,7 @@ One decision rule per law plus the code smell that violates it. No theory — on
    ```
 
 2. Read the specified files (or ask which files to review if none given).
-3. Check against BOTH rule sets: the fetched Vercel guidelines and the Design System + UX Laws + Anti-slop sections above.
+3. Check against BOTH rule sets: the fetched Vercel guidelines, and every section of this file plus [references/component-policies.md](references/component-policies.md) for the components in the target.
 4. Output findings in terse `file:line` format. When the two rule sets conflict, this file wins.
 
 ## Common Mistakes
@@ -255,3 +306,7 @@ One decision rule per law plus the code smell that violates it. No theory — on
 | New tab/panel component with no route | Register the route in the same PR; open the URL in a fresh tab to verify |
 | Every router request replaces the page with one spinner | Track pending state at the interaction and replace only the data-dependent region |
 | Two-way `Light / Dark` toggle, or a language list without Auto | `System / Light / Dark` and `Auto` + languages, System/Auto as defaults |
+| Dialog with both a header X and a footer Cancel | Input and edit dialogs: footer Cancel with `showCloseButton={false}`; view dialogs: X only |
+| Outline Cancel next to a filled Save | `variant="secondary"` for the dismiss action |
+| Phone number split into three inputs | One field with auto-formatting |
+| A spinner alone through a long wait | Status line after 4s; determinate progress after 10s when the task reports it |
