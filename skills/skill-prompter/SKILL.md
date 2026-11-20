@@ -20,11 +20,10 @@ Two skills cover the skill lifecycle. Use the right one — they are not interch
 | Concern | Owner |
 |---------|-------|
 | Step wording, RFC 2119 keywords, atomic decomposition, tool naming, VERIFY gates, decision tables, subagent delegation, escape hatches, dry-run compliance, skill `name` + `description` wording (trigger surface) | **skill-prompter (this skill)** |
-| Skill creation lifecycle, directory layout, file separation, references/scripts/assets organization, modular architecture, merge/split decisions, anti-patterns of structure | **skill-manager** |
+| Directory layout, file separation, references/scripts/assets organization, modular architecture, merge/split decisions, anti-patterns of structure | **skill-manager** |
 
 **Decision rule:**
 - "Steps are being skipped on weaker models" → skill-prompter
-- "I need a new skill from scratch" → skill-manager (then skill-prompter to harden the steps)
 - "Two skills should be merged" or "this skill is too big" → skill-manager
 - "Step instructions are vague" → skill-prompter
 - "Name this skill" or "write/review this skill's description" → skill-prompter (read [references/description-rules.md](references/description-rules.md))
