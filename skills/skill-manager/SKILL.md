@@ -1,6 +1,6 @@
 ---
 name: skill-manager
-description: "Creates, restructures, merges, and splits agent skills: directory layout, bundled guides/scripts/assets, cross-agent placement under .agents/skills, importing community skills, merging several skills into one so fewer descriptions load into every session, and a sanitization pass that checks model IDs against models.dev. Triggers on 스킬 생성, 스킬 병합, 스킬 분리, 스킬 구조 정리, 외부 스킬 가져오기, 스킬 검증, 모델 업그레이드. Step wording and name/description wording go to skill-prompter; finding published skill packages goes to skill-finder. Confirm with the user before running, with a brief explanation of what this skill will do."
+description: "Creates, restructures, merges, and splits agent skills: directory layout, bundled guides/scripts/assets, cross-agent placement under .agents/skills, importing community skills, merging several skills into one so fewer descriptions load into every session, and a sanitization pass that checks model IDs against models.dev. Triggers on 스킬 병합, 스킬 구조 정리, 외부 스킬 가져오기, 스킬 검증, 모델 업그레이드. Step wording and name/description wording go to skill-prompter; finding published skill packages goes to skill-finder. Confirm with the user before running, with a brief explanation of what this skill will do."
 ---
 
 # Skill Manager
