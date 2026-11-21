@@ -1,13 +1,6 @@
----
-name: design-frontend-sangrak
-description: Use when starting frontend work in a project with no existing design system, when building or theming UI with shadcn/ui or Tailwind CSS, or when asked to review/audit web UI. Default design baseline for new screens, plus container-first responsive rules, URL-first routing, scoped async loading, theme/i18n defaults, and applied UX laws.
-metadata:
-  author: kargnas
-  version: "0.10.0"
-  argument-hint: <file-or-pattern>
----
+# App UI
 
-# Design Frontend (Sangrak)
+Rules for screens, components, and flows inside a product, and for UI reviews. They add to the design system in SKILL.md and use its names.
 
 ## Review Preflight
 
@@ -19,7 +12,7 @@ When the current request asks for a review or audit:
 
 A review without a successful WebFetch call is invalid.
 
-Two modes, both grounded in the same design system below:
+Two modes, both grounded in the design system in SKILL.md and the rules below:
 
 - **Build mode** — writing/editing UI code: apply the design system directly.
 - **Review mode** — asked to review/audit UI: check code against the design system AND the fetched Vercel guidelines, output findings as terse `file:line` entries.
@@ -37,64 +30,18 @@ Transition references: [01](sub-skills/transitions-dev/01-card-resize.md), [02](
 
 Everything below uses shadcn/ui (CLI v4) and Tailwind CSS v4 names.
 
-- **New project:** `npx shadcn@latest init -b base -p mira --pointer` (add `-t next|vite|start|react-router|laravel|astro` when no app exists yet), then `npx shadcn@latest add font-jetbrains-mono`. That font item also rewrites the `html` rule in `@layer base` to `@apply font-mono`; set it back to `@apply font-sans` so mono stays limited to numbers and identifiers. Mira already sets Inter as `--font-sans`, and `--pointer` writes the button cursor rule. Then apply the theme below.
+- **New project:** `npx shadcn@latest init -b base -p mira --pointer` (add `-t next|vite|start|react-router|laravel|astro` when no app exists yet), then `npx shadcn@latest add font-jetbrains-mono`. That font item also rewrites the `html` rule in `@layer base` to `@apply font-mono`; set it back to `@apply font-sans` so mono stays limited to numbers and identifiers. Mira already sets Inter as `--font-sans`, and `--pointer` writes the button cursor rule. Then MUST wire the theme (Theme wiring below) before adding components.
 - **Existing project with `components.json`:** run `npx shadcn@latest info --json` first and follow its base (`base`/`radix`/`aria`), style, icon library, and Tailwind version. Never re-run `init` or switch presets unasked.
 - **Legacy markers:** if the theme lives in `tailwind.config.*`, the CSS starts with `@tailwind base`, `lib/utils.ts` builds `cn` from `clsx` + `tailwind-merge`, `components.json#style` is `default`/`new-york`, or the CSS defines `--bg`/`--panel`/`--ink`, read [references/legacy.md](references/legacy.md) before writing code.
-- Component APIs, composition, and CLI flags come from `npx shadcn@latest docs <component>` (or the official shadcn skill when installed). This file only adds the design system on top.
+- Component APIs, composition, and CLI flags come from `npx shadcn@latest docs <component>` (or the official shadcn skill when installed). This skill only adds the design system on top.
+- shadcn `Chart` (Recharts) for multi-series dashboards; inline SVG only for sparklines.
 
-### After every `shadcn add`
+### Theme wiring
 
-Generated components are project code. Bring them onto this system before using them:
+Set the theme token values from SKILL.md in the `:root` and `.dark` blocks that `init` generated. Tokens not listed (`--destructive`, `--chart-*`, `--radius`) keep the preset values.
 
-| Generated | Change to |
-|---|---|
-| `import { cn } from "cn"` | `import { cn } from "@/lib/utils"` (the `utils` alias), the instance that knows the type scale |
-| `text-xs/relaxed`, `text-xs`, `text-sm`, `text-base`, `text-[0.625rem]` | The role's token from the type scale below; keep line-height modifiers such as `/relaxed` |
-| `transition-all` (Button, Badge, Tabs, Sidebar) | `transition-colors`, or Tailwind's default `transition` when a transform animates |
-| `shadow-md`/`shadow-lg` (menus, Select, Sheet, Toast) | `shadow-card dark:shadow-none` |
-| `p-6` (Sheet, Empty), card `--spacing(5)` or more (Vega, Rhea) | `p-4`, `--spacing(4)` |
-| `Kbd` with `font-sans` and no border | The badge style in Keyboard hints |
-| `data-active:bg-sidebar-accent` on `SidebarMenuButton` | `data-active:bg-primary/10 dark:data-active:bg-primary/14` |
-| `active:not-aria-[haspopup]:translate-y-px` on `Button` | The press feedback in Interaction & Accessibility |
-| `AlertDialogCancel` defaulting to `variant = "outline"` | `variant = "secondary"`, because outline pairs only with outline |
-| `showOutsideDays = true` in `Calendar` | `showOutsideDays = false`, so days of other months stay blank |
-
-## Design System
-
-### Theme tokens (`:root` / `.dark`)
-
-Set these values in the `:root` and `.dark` blocks that `init` generated. Tokens not listed (`--destructive`, `--chart-*`, `--radius`) keep the preset values.
-
-| Tokens | Light | Dark |
-|---|---|---|
-| `--background`, `--sidebar` | `oklch(0.985 0 0)` | `oklch(0.145 0.002 286.131)` |
-| `--card`, `--popover` | `oklch(1 0 0)` | `oklch(0.192 0.004 286.018)` |
-| `--foreground`, `--card-foreground`, `--popover-foreground`, `--secondary-foreground`, `--accent-foreground`, `--sidebar-foreground`, `--sidebar-accent-foreground` | `oklch(0.169 0.002 286.177)` | `oklch(0.947 0.003 286.349)` |
-| `--muted-foreground` | `oklch(0.551 0.023 264.364)` | `oklch(0.649 0.015 262.359)` |
-| `--primary`, `--sidebar-primary`, `--ring`, `--sidebar-ring` | `oklch(0.567 0.159 275.206)` | `oklch(0.567 0.159 275.206)` |
-| `--primary-foreground`, `--sidebar-primary-foreground` | `oklch(1 0 0)` | `oklch(1 0 0)` |
-| `--accent`, `--muted`, `--secondary`, `--sidebar-accent` | `oklch(0 0 0 / 3.5%)` | `oklch(1 0 0 / 5%)` |
-| `--border`, `--sidebar-border` | `oklch(0 0 0 / 8%)` | `oklch(1 0 0 / 8%)` |
-| `--input` | `oklch(0 0 0 / 12%)` | `oklch(1 0 0 / 12%)` |
-
-- `primary` is the single accent color, and focus rings use it too. shadcn's `accent` is the hover/selected surface, not the brand color.
-- Selected or active backgrounds use `bg-primary/10 dark:bg-primary/14`.
-- A new semantic color follows shadcn's pair convention: `--name` and `--name-foreground` in `:root` and `.dark`, exposed with `@theme inline { --color-name: var(--name); }`.
-
-Add the type scale and the only allowed elevation to the same CSS file:
-
-```css
-@theme {
-  --text-kpi: 24px;     /* KPI numbers */
-  --text-title: 14px;   /* page, card, dialog titles */
-  --text-body: 13px;    /* body, nav, menus, buttons, inputs, table cells */
-  --text-caption: 12px; /* captions, field labels, table headers */
-  --text-micro: 11px;   /* kbd, badges, xs buttons, menu shortcuts */
-  --shadow-card: 0 1px 2px rgb(0 0 0 / 0.04);
-}
-```
-
-The text tokens set font size only. Line height comes from the parent or from a modifier such as `text-body/relaxed`.
+- A new semantic color is exposed with `@theme inline { --color-name: var(--name); }`.
+- Add the `@theme` block from SKILL.md (type scale and `--shadow-card`) to the same CSS file.
 
 Tailwind inlines theme shadows into the utility, so dark mode drops the card shadow with `dark:shadow-none`, not by redefining `--shadow-card`.
 
@@ -111,33 +58,24 @@ export const cn = createCn({
 
 New projects adopt these values as-is; existing projects with their own tokens keep theirs — the density and anti-slop rules still apply.
 
-### Fonts
+### After every `shadcn add`
 
-- Inter (`font-sans`, UI text), JetBrains Mono (`font-mono` — numbers/ids/paths/status badges), Noto Sans KR/SC/JP appended to the `--font-sans` stack as CJK fallback.
-- Numbers, identifiers, file paths, and status badges are ALWAYS `font-mono` — proportional digits jitter when values update.
+Generated components are project code. Bring them onto this system before using them:
 
-### Status colors
+| Generated | Change to |
+|---|---|
+| `import { cn } from "cn"` | `import { cn } from "@/lib/utils"` (the `utils` alias), the instance that knows the type scale |
+| `text-xs/relaxed`, `text-xs`, `text-sm`, `text-base`, `text-[0.625rem]` | The role's token from the type scale in SKILL.md; keep line-height modifiers such as `/relaxed` |
+| `transition-all` (Button, Badge, Tabs, Sidebar) | `transition-colors`, or Tailwind's default `transition` when a transform animates |
+| `shadow-md`/`shadow-lg` (menus, Select, Sheet, Toast) | `shadow-card dark:shadow-none` |
+| `p-6` (Sheet, Empty), card `--spacing(5)` or more (Vega, Rhea) | `p-4`, `--spacing(4)` |
+| `Kbd` with `font-sans` and no border | The badge style in Keyboard hints |
+| `data-active:bg-sidebar-accent` on `SidebarMenuButton` | `data-active:bg-primary/10 dark:data-active:bg-primary/14` |
+| `active:not-aria-[haspopup]:translate-y-px` on `Button` | The press feedback in Interaction |
+| `AlertDialogCancel` defaulting to `variant = "outline"` | `variant = "secondary"`, because outline pairs only with outline |
+| `showOutsideDays = true` in `Calendar` | `showOutsideDays = false`, so days of other months stay blank |
 
-One status vocabulary for every component (badge, field, toast, chart):
-
-- critical (error, failure, rejected, failed check) = `destructive`.
-- warning (expiring soon, missing submission) = amber. Quota/progress bars use amber for the 20-50% remaining band.
-- live/streaming = emerald.
-- neutral, ok, and informative (beta, limited permission) = `text-muted-foreground`. Positive results (saved, approved, published) count as ok.
-- AI features and AI-generated content carry one marker everywhere, including their loading and notice states: the same icon from the project's icon set plus an `AI` label, with no extra color.
-
-### Density scale
-
-- Padding: boxes/cards/bands use the SAME value on all four sides — large cards `p-4`, dense boards/list items `p-3` (shadcn `Card` default and `size="sm"`). Asymmetric padding only on small buttons/chips (and table cells `px-4 py-2`).
-- **Padding/gap tokens never exceed 16px (=4)** — `p-5`/`p-6`/`gap-5`+ and `--spacing(5)`+ are forbidden. Gaps: `gap-2/3/4`.
-- Vertical rhythm: `mt-8` between sections, `mb-3` between a section title and its content — same scale on every section. Inside a card's internal list: `space-y-3`/`space-y-3.5`.
-- Header bars: `h-12` (page header, sidebar logo), `h-11` (card/table header).
-- Font sizes — the entire scale is the five `@theme` tokens: `text-kpi`, `text-title`, `text-body`, `text-caption`, `text-micro`. Do not introduce new sizes or arbitrary `text-[Npx]` values.
-- Headings are semantic `h1`/`h2` with `text-balance`. Dates and comparable numbers get `tabular-nums`.
-- Labels/questions recede visually (small, secondary ink); the answer/content is the visual protagonist.
-- A screen may declare an explicit, documented exception to this scale (e.g. an ultra-dense matrix), but the exception must be written down where the screen lives and ideally pinned by a test — never silently drift.
-
-### Keyboard hints
+## Keyboard hints
 
 - The rule is about labeling, not about adding shortcuts: **any action that IS keyboard-accessible displays its shortcut inline** as a `<kbd>` badge (`⌘K` inside a search field, `⌘↵` next to a submit label). No hidden shortcuts — if it works from the keyboard, the UI says so.
 - Inventing new shortcuts is fine too, but the key map MUST mirror a well-known global product in the same category (Linear/Slack/Gmail/GitHub conventions — `⌘K` command palette, `⌘↵` submit, `/` focus search, `j`/`k` navigate). Never invent a novel binding for an action those products already have a convention for.
@@ -146,25 +84,14 @@ One status vocabulary for every component (badge, field, toast, chart):
 - A displayed shortcut MUST actually work — wire the handler in the same PR as the badge. A dead `<kbd>` hint is worse than none.
 - Badges are decorative for screen readers: `aria-hidden` on the `<kbd>`, put the shortcut in the control's `aria-keyshortcuts` instead.
 
-### Layout & Responsive
-
-- Layout responds to **container width**; chrome (nav pattern, target size, popover vs sheet) responds to **input method**. Never bind both to one viewport breakpoint.
-- Inside a region (card, form, table, panel) use `@container` on the wrapper and `@md:`-style variants on descendants. Viewport `md:`/`lg:` only for the page skeleton: whether the sidebar exists, header arrangement, sticky bars.
-- Grids: `repeat(auto-fit, minmax(Npx, 1fr))`. Column count is derived from available space, never declared per breakpoint. The `grid-cols-1 md:grid-cols-2 lg:grid-cols-4` ladder is forbidden.
-- Narrow ≠ mobile. An 800px desktop window keeps the density scale, hover states, and mouse chrome. Phone-only treatment (hamburger, bottom nav, sheets, 44px targets) is gated by `pointer-coarse:` (`@media (pointer: coarse)`); Tailwind v4 already scopes `hover:` to `@media (hover: hover)`.
-- Regions degrade independently: sidebar → icon rail → hidden; table → hide low-priority columns → horizontal scroll (never row-to-card); grid → fewer columns. One region collapsing must not collapse another.
-- No horizontal overflow at any width. `h-dvh`/`min-h-dvh`, not `h-screen` (`100vh`).
-- Type and spacing stay on the fixed scale — no `clamp()`. Width changes column count and region visibility, nothing else.
-- Verify in one window at 375 / 800 / 1280. 800 must read as a narrow desktop, not a phone.
-
-### Routing & URL
+## Routing & URL
 
 - **URL first.** User intent (tab, filter, sort, page, selected item, open panel) writes the URL; the UI is a function of the URL and re-renders from it. Never mutate state and then "sync" the URL afterwards — no parallel `useState` copy of anything the URL already says.
 - A screen without a route is unfinished: every new page, tab, panel, and modal gets its route in the same PR. Verify by pasting the URL into a fresh tab.
 - Navigation is `<a>`/`<Link>` (Cmd-click works); opening a modal/panel pushes history so Back closes it, filter/sort changes replace.
 - A button-styled link stays a link: `<Link className={buttonVariants({ variant: "outline" })}>`. On Base UI never pass `render={<a />}` to `Button`, because it forces `role="button"`; on Radix, wrap the `<Link>` in `<Button asChild>`.
 
-### Loading Scope
+## Loading Scope
 
 - Scope pending UI to the smallest region invalidated by the request: a tab replaces its panel, a filter or page change replaces its results, and a chart selection replaces only the dependent chart. Keep the app shell, navigation, headers, and independent sibling regions mounted.
 - A router or network request does not by itself justify a page loader. Whole-page initialization is reserved for the first load when no stable shell or useful content can render. Never subscribe a page to every router/network start event and swap the entire page for a spinner.
@@ -174,10 +101,11 @@ One status vocabulary for every component (badge, field, toast, chart):
 - A wait that can hang (fetching location, external verification) gets a timeout that ends in an error with a retry.
 - `Skeleton` (first load only, as in UX Laws) fits a known layout, such as repeated lists and fixed layouts, and matches the real content's size, line height, and radius. `Spinner` fits an unknown layout, saves, and partial refreshes. One region never shows both.
 - A plain data load needs no success message; the data is the result.
+- Loading states: distinguish initializing (no data yet) from loading (refresh); show an animated spinner in the scope defined here; don't leave stale data visible during a new load unless explicitly requested.
 
-### Theme & Language
+## Theme & Language
 
-- Theme selector is three-way `System / Light / Dark`, default System (`prefers-color-scheme`), persisted; the `.dark` class on `<html>` drives the tokens above through shadcn's `@custom-variant dark (&:is(.dark *))`. Nothing ships light-only.
+- The theme selector (SKILL.md, Theme tokens) sets the `.dark` class on `<html>`, which drives the tokens through shadcn's `@custom-variant dark (&:is(.dark *))`.
 - Language selector lists `Auto` first (from `navigator.languages`, never IP), then each supported language; default Auto, persisted.
 - No hardcoded UI strings, ever — internal tools and prototypes included. Every user-visible string goes through the i18n layer (`t()`), one translation file per locale, keys added in the same PR as the UI.
 
@@ -199,44 +127,19 @@ One decision rule per law plus the code smell that violates it. No theory — on
 | Recognition over recall (Nielsen 6) | Current state always visible: active filters as chips, selected value in the trigger, format example in the placeholder, recents first; raw values shown, derived values alongside | filter applied but not displayed; rounded number hiding the raw |
 | Tesler | Complexity moves, it doesn't vanish: move it into the system (smart defaults, derive platform/timezone/group, remember the last choice) | asking for a value the app already knows |
 
-## Anti-slop (never do this)
+## Interaction (required, not optional)
 
-- **No left accent border** on cards, rows, or nav items — ever, on any page.
-- No drop shadows beyond `shadow-card` (dark mode has none at all). A sticky header over scrolling content separates with a hairline (`border-b`), not a shadow.
-- No gradient fills (backgrounds, text, borders), no decorative icons beyond the project's icon set (`components.json#iconLibrary`).
-- shadcn `Chart` (Recharts) for multi-series dashboards; inline SVG only for sparklines.
-- No new font sizes, weights, or spacing values outside the scale above.
-- Margin/padding must be consistent with sibling components of the same purpose; misaligned spacing is a bug, not a nit.
-- Loading states: distinguish initializing (no data yet) from loading (refresh); show an animated spinner in the scope defined above; don't leave stale data visible during a new load unless explicitly requested.
-- **Stat tiles / big numbers.** A row of label + huge number is the signature AI-slop dashboard move. Rules:
-  - Big-number treatment (`text-kpi`) is EARNED by context: the tile must carry a delta vs previous period, a target, or a sparkline. A bare number with no context cannot be a tile — demote it to a table/list row.
-  - Cumulative counters (total tokens, total requests, all-time sums) are logs, not KPIs — they belong in a table row, never a stat tile.
-  - Never repeat as a big number what a table on the same screen already shows. The tile row is not a table header.
-- **Avatar initials / name placeholders.** A circle holding one Hangul syllable, surname or given name (`김`, `민`), identifies no one: too many people share each syllable. Rules:
-  - If the people data has no photo field, or most records leave it empty (meeting participants, recordings, imported contacts), draw no avatars. List the names as text, the first one or two and then `+N`, with the full list one click or tap away.
-  - If photos are the norm and one is missing, a Korean name's `AvatarFallback` holds a neutral person icon from the project's icon set. It may hold the two-syllable given name instead only when all three hold: the circle fits two syllables at `text-micro` or larger; the data already stores the given name in its own field (never split a full name, since 남궁·제갈·선우 are two-syllable surnames); and the service supports a small fixed set of languages, such as Korean only or Korean and English.
-
-## Interaction & Accessibility (required, not optional)
-
-- Every interactive element has BOTH a visible focus ring (shadcn's `focus-visible:ring-*` + `focus-visible:ring-ring/*` pair) and a `hover:` state. `outline-none`/`outline-hidden` without a visible focus replacement is forbidden.
 - Press feedback changes only the surface color, never the text or icon color. `active:` reuses the variant's hover surface instead of a new color, and ghost elements get that surface too, so a mouse user sees one style on hover and on press.
 - An element whose color already means its state (`Switch`, a selected tab or chip) shows a press by scale only.
 - Press scale moves a fixed 2px, not a fixed ratio: `scale = (basis - 2) / basis`, where `basis = max(height, width / 4, 24)` in px. A 32×32 icon button presses to `scale-[0.938]` and a 120×48 button to `scale-[0.958]`. Color and scale share one transition (Tailwind's default `transition`, 150ms) and start together.
 - Only the pressed element shrinks. A checkbox inside a shrinking row doesn't shrink on its own, and a card with several equal actions (open, like, save) lets only the pressed button react. Loading and disabled elements don't shrink, and `motion-reduce:` drops the scale but keeps the color change.
 - A loading button ignores repeat activation. It stays enabled only when a click must still do something during loading (cancel, stop); otherwise it is disabled.
-- Long-text containers get `wrap-break-word` (`wrap-anywhere` in table cells, where `break-word` cannot shrink the column); flex/grid children that hold text get `min-w-0` (the classic invisible-overflow bug).
 - `transition-all` is forbidden — name the transitioned properties (`transition-colors`, `transition-opacity`). Respect `motion-reduce:`.
 - Tap targets get `touch-manipulation`.
-- Every clickable element shows `cursor-pointer` — buttons, links styled as buttons, clickable rows/cards/list items, tabs, chips, icon buttons. Tailwind v4 Preflight sets `cursor: default` on `<button>`, so `<button>` is NOT exempt: `init --pointer` writes the base rule (`button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer }`); a project created without it adds the rule once, or the class per element. Disabled controls get `cursor-not-allowed`; text inputs keep the I-beam.
-- Every screen is usable on mobile web (375px wide, touch, no hover): tap targets are at least 44×44px under touch (`pointer-coarse:min-h-11`, dense table rows included — Mira ships 28px controls), nothing is hover-only — an action revealed on `hover:` is also always visible on touch (`pointer-coarse:opacity-100`) or reachable from a tap menu, and horizontal scroll lives only inside tables/code (`overflow-x-auto` on that container), never on the page. Check 375px before calling a screen done.
-- On every pointer, a target is at least 24×24px. A small icon or a control drawn smaller gets a larger hit area, not a larger glyph.
+- Tailwind v4 Preflight sets `cursor: default` on `<button>`. `init --pointer` writes the pointer-cursor base rule from SKILL.md (Accessibility); a project created without it adds the rule once, or the class per element.
 - Every pinch or drag action also works with a tap or a click.
-- Color never carries information alone: pair it with text or an icon (status, errors, chart series).
-- Color pairs outside the theme table (status, chart, and new semantic colors) meet APCA contrast: Lc 75 (90 preferred) for body text, titles, input values, and tooltips; Lc 60 for other text; Lc 30 for placeholder and disabled text.
 - A one-shot animation (not a loading indicator) stays under 2s or offers a skip. Nothing flashes more than 3 times per second. Media doesn't autoplay by default; media that must autoplay starts muted, and sound that plays longer than 3s gets a pause, stop, or volume control.
 - Errors and status changes that appear in place are announced: `FieldError` has `role="alert"`, and other async results go in an `aria-live` region.
-- Enlarged text (browser zoom, OS text size) wraps instead of clipping, and button rows stack.
-- Decorative elements get `aria-hidden`.
 
 ## UI Copy
 
@@ -272,8 +175,8 @@ These rules hold in every language. A `한국어의 경우:` line adds the Korea
    ```
 
 2. Read the specified files (or ask which files to review if none given).
-3. Check against BOTH rule sets: the fetched Vercel guidelines, and every section of this file plus [references/component-policies.md](references/component-policies.md) for the components in the target.
-4. Output findings in terse `file:line` format. When the two rule sets conflict, this file wins.
+3. Check against BOTH rule sets: the fetched Vercel guidelines, and every section of SKILL.md and this file, plus [references/component-policies.md](references/component-policies.md) for the components in the target.
+4. Output findings in terse `file:line` format. When the two rule sets conflict, this design system wins.
 
 ## Common Mistakes
 

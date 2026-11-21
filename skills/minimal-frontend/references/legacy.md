@@ -84,9 +84,9 @@ Reading v3 class names:
 |---|---|
 | `components.json#style` is `new-york` (Radix, before the `{base}-{style}` presets) | Same rules; run the "After every `shadcn add`" table on its components |
 | `:root` values written as `hsl(…)` (upgraded from v3) | The OKLCH values from the theme table work as-is |
-| `lib/utils.ts` builds `cn` from `clsx` + `tailwind-merge` | The `createCn` setup in the theme section, after `npx shadcn@latest migrate cn`; until then register the scale with `extendTailwindMerge` and the same `extend` object |
+| `lib/utils.ts` builds `cn` from `clsx` + `tailwind-merge` | The `createCn` setup in Theme wiring (app.md), after `npx shadcn@latest migrate cn`; until then register the scale with `extendTailwindMerge` and the same `extend` object |
 | Components import `@radix-ui/react-*` | The unified `radix-ui` package, via `npx shadcn@latest migrate radix` |
 | `@plugin "tailwindcss-animate"` | `@import "tw-animate-css"` |
 | No `Kbd`, `Spinner`, `Empty`, `Field`, `Item`, `InputGroup`, `ButtonGroup` | `npx shadcn@latest add <name>` instead of hand-rolling them |
-| No pointer-cursor base rule | Add the rule from Interaction & Accessibility |
+| No pointer-cursor base rule | Add the rule from Accessibility in SKILL.md |
 | Radix `asChild` | Base UI uses `render`; button-styled links still use `buttonVariants()` |
