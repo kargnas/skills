@@ -1,11 +1,11 @@
 ---
 name: skill-manager
-description: "Creates, restructures, merges, and splits agent skills: directory layout, bundled guides/scripts/assets, cross-agent placement under .agents/skills, importing community skills, merging several skills into one so fewer descriptions load into every session, and a sanitization pass that checks model IDs against models.dev. Triggers on 스킬 생성, 스킬 병합, 스킬 분리, 스킬 구조 정리, 외부 스킬 가져오기, 스킬 검증, 모델 업그레이드. Step wording and name/description wording go to skill-prompter; finding published skill packages goes to skill-finder. Confirm with the user before running, with a brief explanation of what this skill will do."
+description: "Restructures and merges agent skills: directory layout, bundled guides/scripts/assets, cross-agent placement under .agents/skills, importing community skills, merging several skills into one so fewer descriptions load into every session, and a sanitization pass that checks model IDs against models.dev. Triggers on 스킬 병합, 스킬 구조 정리, 외부 스킬 가져오기, 스킬 검증, 모델 업그레이드. Requests to create a new skill do not trigger this skill; it runs for creation only when the user invokes it by name. Step wording and name/description wording go to skill-prompter; finding published skill packages goes to skill-finder. Confirm with the user before running, with a brief explanation of what this skill will do."
 ---
 
 # Skill Manager
 
-This skill provides guidance for the full lifecycle of skill structure — creating new skills, modifying skill structure, merging related skills together, splitting overgrown skills into focused ones, and refactoring directory and file layout.
+This skill provides guidance for skill structure — modifying skill structure, merging related skills together, splitting overgrown skills into focused ones, and refactoring directory and file layout.
 
 When starting, let the user know in one line that this skill is being used.
 
@@ -15,11 +15,11 @@ Two skills cover the skill lifecycle. Use the right one — they are not interch
 
 | Concern | Owner |
 |---------|-------|
-| Skill creation, directory layout, file separation, typed bundled-resource organization (guides/api-references/sub-skills/scripts/assets), modular architecture decisions, merge/split, structural anti-patterns | **skill-manager (this skill)** |
+| Directory layout, file separation, typed bundled-resource organization (guides/api-references/sub-skills/scripts/assets), modular architecture decisions, merge/split, structural anti-patterns | **skill-manager (this skill)** |
 | Step wording, RFC 2119 keywords, atomic step decomposition, explicit tool naming, VERIFY gates, decision tables, subagent delegation, escape hatches, dry-run compliance for weaker LLMs, skill name + description wording (trigger surface) | **skill-prompter** |
 
 **Decision rule:**
-- "I need a new skill from scratch" → skill-manager (then hand the resulting steps to skill-prompter for compliance hardening)
+- "I need a new skill from scratch" → does NOT route here. Run the Skill Creation Process below only when the user invokes skill-manager by name.
 - "Two skills should be merged" or "this skill is too big to split" → skill-manager
 - "Steps in my skill are getting skipped on weaker models" → skill-prompter
 - "Step instructions are vague or have no VERIFY gate" → skill-prompter

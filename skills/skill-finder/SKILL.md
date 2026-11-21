@@ -214,11 +214,11 @@ Community skills MUST NOT be installed with blind global fan-out. Before install
 
 ## When no skills are found
 
-1. Acknowledge. 2. Offer to handle the task with general capabilities. 3. Suggest creating a new skill via `skill-manager` (or `npx skills init`).
+1. Acknowledge. 2. Offer to handle the task with general capabilities. 3. Suggest creating a new skill (`npx skills init`).
 
 ### Decision rule: when to stop searching and write your own
 
-After exhausting Path A + the GitHub sweep + 2 query reformulations, if the top results are all adjacent-but-not-matching, generic copy-editing tools when you need contextual logic, or star-leaders that fail [S4] content inspection — STOP searching. Writing a custom skill via `skill-manager` is faster than the next 3 reformulations. The niche is genuinely yours (not just under-searched) when: the task involves the user's personal voice/language/workflow; it spans 2+ languages with user-specific rules; the right answer needs the user's memory/people files first; existing community skills assume a generic English use case.
+After exhausting Path A + the GitHub sweep + 2 query reformulations, if the top results are all adjacent-but-not-matching, generic copy-editing tools when you need contextual logic, or star-leaders that fail [S4] content inspection — STOP searching. Writing a custom skill is faster than the next 3 reformulations. The niche is genuinely yours (not just under-searched) when: the task involves the user's personal voice/language/workflow; it spans 2+ languages with user-specific rules; the right answer needs the user's memory/people files first; existing community skills assume a generic English use case.
 
 ## Constraints
 

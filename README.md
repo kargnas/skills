@@ -41,7 +41,7 @@ npx -y skills add kargnas/skills --skill vscode-ready
 
 ### `skill-manager`
 
-스킬의 생성, 수정, 병합, 분리, 구조 정리, 외부 스킬 가져오기를 관리합니다. 스킬에 적힌 모델 ID는 실행할 때마다 models.dev에서 조회해 낡은 모델과 최신 대체 모델을 찾습니다.
+스킬의 수정, 병합, 분리, 구조 정리, 외부 스킬 가져오기를 관리합니다. 스킬에 적힌 모델 ID는 실행할 때마다 models.dev에서 조회해 낡은 모델과 최신 대체 모델을 찾습니다.
 
 ```bash
 npx -y skills add kargnas/skills --skill skill-manager
@@ -157,7 +157,7 @@ codex plugin add kargnas-skills@kargnas-plugins
 | --- | --- |
 | [`ai-ready`](skills/ai-ready/) | 프로젝트를 AI 에이전트가 작업하기 쉬운 구조로 정비 |
 | [`vscode-ready`](skills/vscode-ready/) | VS Code/Cursor의 실행·디버그·작업 설정 생성 |
-| [`skill-manager`](skills/skill-manager/) | 스킬 구조와 전체 생명주기 관리 |
+| [`skill-manager`](skills/skill-manager/) | 스킬 구조 정리, 병합, 외부 스킬 가져오기 |
 | [`skill-prompter`](skills/skill-prompter/) | 스킬 지시문의 실행 준수율과 트리거 문구 개선 |
 | [`humanizer-kill-gpt`](skills/humanizer-kill-gpt/) | 영어·한국어 글의 GPT·LLM 문체 흔적 제거 |
 | [`git-lore`](skills/git-lore/) | Captures, queries, and configures decision context in native Git trailers |
