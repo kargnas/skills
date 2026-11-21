@@ -1,6 +1,6 @@
 # Component Policies
 
-Counts, behavior, and copy limits per component. Tokens, spacing, chrome, and loading come from SKILL.md, which wins on conflict. Read the sections for the components you build or review.
+Counts, behavior, and copy limits per component. Tokens and spacing come from SKILL.md, chrome and loading from app.md; both win on conflict. Read the sections for the components you build or review.
 
 ## Badges
 
@@ -28,7 +28,7 @@ Counts, behavior, and copy limits per component. Tokens, spacing, chrome, and lo
 
 ## Buttons
 
-- At most one filled button per view, whatever its color (SKILL.md, Von Restorff).
+- At most one filled button per view, whatever its color (app.md, Von Restorff).
 - At most 2 buttons side by side. Further actions move to an icon button or the `…` menu, because 3 or more side by side look equally important and truncate when text is enlarged.
 - A dismiss action (Close, Reset) next to the filled button uses `variant="secondary"`. In a full-width row, the two split 3:7 (dismiss : primary). Two secondary actions of equal weight split evenly.
 - `outline` pairs only with `outline`, never with a filled button. Use it when the same action repeats across a screen, such as row and card actions.

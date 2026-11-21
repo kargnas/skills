@@ -95,12 +95,16 @@ Orca 같은 로컬 프록시를 거쳐도 세션 키로 실시간 연결을 인�
 npx -y skills add kargnas/skills --skill ui-buffet
 ```
 
-### `design-frontend-sangrak`
+### `minimal-frontend`
 
-디자인 시스템이 없는 프로젝트의 프론트엔드 기본값입니다. 최신 shadcn/ui(Base UI, Mira 프리셋)와 Tailwind CSS v4 명명 규칙에 맞춘 테마 토큰과 타입·밀도 스케일, 컨테이너 쿼리 기반 반응형 규칙, URL 라우팅, 영역별 비동기 로딩, 테마·언어 기본값, UX 법칙과 CSS 전환 패턴 32개를 담았습니다. 배지, 대화상자, 버튼, 내비게이션, 선택 컨트롤, 날짜·시간 선택, 폼, 목록, 빈 화면에 적용하는 컴포넌트별 정책과 UI 문구 규칙도 들어 있으며, 한국어 UI에만 해당하는 규칙은 따로 표시했습니다. Tailwind CSS v3나 이전 토큰 이름을 쓰는 프로젝트를 위한 대응표도 함께 제공합니다. 리뷰 모드에서는 Vercel Web Interface Guidelines와 함께 `file:line` 형식으로 지적합니다.
+디자인 시스템이 없는 프로젝트의 프론트엔드 기본값입니다. 앱 화면과 단독 HTML 리포트 페이지가 같은 디자인을 쓰도록, 공통 규칙은 `SKILL.md`에 두고 용도별 규칙은 `app.md`와 `report.md`로 나눴습니다. 공통 규칙에는 최신 shadcn/ui(Base UI, Mira 프리셋)와 Tailwind CSS v4 명명 규칙에 맞춘 테마 토큰, 타입·밀도 스케일, 상태 색, 컨테이너 쿼리 기반 반응형 규칙, 접근성 기준이 들어 있습니다.
+
+앱 화면 규칙은 URL 라우팅, 영역별 비동기 로딩, 테마·언어 기본값, UX 법칙과 CSS 전환 패턴 32개를 담았습니다. 배지, 대화상자, 버튼, 내비게이션, 선택 컨트롤, 날짜·시간 선택, 폼, 목록, 빈 화면에 적용하는 컴포넌트별 정책과 UI 문구 규칙도 들어 있으며, 한국어 UI에만 해당하는 규칙은 따로 표시했습니다. Tailwind CSS v3나 이전 토큰 이름을 쓰는 프로젝트를 위한 대응표도 함께 제공합니다. 리뷰 모드에서는 Vercel Web Interface Guidelines와 함께 `file:line` 형식으로 지적합니다.
+
+리포트 페이지 규칙은 조사 결과나 분석을 사람이 읽는 HTML 파일 하나로 만들 때 적용합니다. shadcn이나 Tailwind 없이 같은 테마 토큰을 일반 CSS로 선언하는 방법, 페이지 골격, 수치·막대·타임라인·표·배지·인용 블록의 모양, 기록과 발언과 추론을 구분하는 문구 규칙, 전달하기 전에 화면을 확인하는 절차를 담았습니다.
 
 ```bash
-npx -y skills add kargnas/skills --skill design-frontend-sangrak
+npx -y skills add kargnas/skills --skill minimal-frontend
 ```
 
 ### `slack-api-readonly`
@@ -163,7 +167,7 @@ codex plugin add kargnas-skills@kargnas-plugins
 | [`git-lore`](skills/git-lore/) | Captures, queries, and configures decision context in native Git trailers |
 | [`minimal-patch-with-subagents`](skills/minimal-patch-with-subagents/) | 병렬 서브에이전트 토론으로 확정된 버그의 최소·최저위험 패치 선택 |
 | [`ui-buffet`](skills/ui-buffet/) | Previews several UI/UX design concepts in the browser and builds the pick |
-| [`design-frontend-sangrak`](skills/design-frontend-sangrak/) | shadcn/ui·Tailwind CSS v4 기반 디자인 시스템 기본값, 컨테이너 기반 반응형 규칙, 영역별 비동기 로딩, 적용형 UX 법칙, 컴포넌트별 정책, UI 문구 규칙, CSS 전환 패턴 32개 |
+| [`minimal-frontend`](skills/minimal-frontend/) | shadcn/ui·Tailwind CSS v4 기반 디자인 시스템 기본값, 컨테이너 기반 반응형 규칙, 영역별 비동기 로딩, 적용형 UX 법칙, 컴포넌트별 정책, UI 문구 규칙, CSS 전환 패턴 32개, 같은 디자인을 쓰는 HTML 리포트 페이지 규칙 |
 | [`slack-api-readonly`](skills/slack-api-readonly/) | Slack 채널·스레드·검색 결과를 읽기 전용 Web API로 가져와 LLM용 마크다운으로 변환 |
 | [`oss-finder`](skills/oss-finder/) | GitHub 레포·코드를 polish-days 기준으로 찾아 순위화하는 검색 백엔드 툴킷 |
 | [`skill-finder`](skills/skill-finder/) | 설치 가능한 SKILL.md 스킬을 마켓플레이스와 GitHub에서 찾아 semantic polish-days로 순위화 |
