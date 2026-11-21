@@ -1,6 +1,6 @@
 ---
 name: minimal-frontend
-description: Design system shared by app UI and standalone HTML report pages, covering theme tokens, type and density scale, status colors, container-first responsive rules, anti-slop, and accessibility. Use when starting frontend work in a project with no existing design system, when building or theming UI with shadcn/ui or Tailwind CSS, when asked to review or audit web UI, or when findings, an analysis, or a status must become an HTML page people read (report page, readable page, 리포트, 보고서, html로 만들어, 보기 쉽게 정리). App rules add URL-first routing, scoped async loading, theme and i18n defaults, applied UX laws, component policies, and UI copy. Report rules add the page skeleton, blocks, and wording.
+description: Design system shared by app UI and standalone HTML report pages, covering theme tokens, type and density scale, status colors, container-first responsive rules, anti-slop, and accessibility. Use when starting frontend work in a project with no existing design system, when building or theming UI with shadcn/ui or Tailwind CSS, when asked to review or audit web UI, or when findings, an analysis, or a status must become an HTML page people read (report page, readable page, 리포트, 보고서, html로 만들어, 보기 쉽게 정리). App rules add URL-first routing, scoped async loading, theme and i18n defaults, applied UX laws, component policies, and UI copy. Report rules add the page skeleton, blocks, wording, and checkbox options for inline translation with original-text tooltips and for speaker photos (인용 번역, 원문 툴팁, 발언자 프사).
 metadata:
   author: kargnas
   version: "0.11.0"
@@ -19,7 +19,7 @@ One design system for two kinds of output: app UI and report pages. This file ho
 | A review or audit of web UI | [app.md](app.md), Review Preflight first; also [report.md](report.md) when the target is a report page |
 | Report page: one standalone HTML file that presents findings, an analysis, or a status to readers | [report.md](report.md) |
 
-`app.md` says when to read these, and a report page never needs them: [references/component-policies.md](references/component-policies.md) for per-component counts, behavior, and copy limits; [references/legacy.md](references/legacy.md) for Tailwind CSS v3 and older token names; the [Transitions.dev guide](sub-skills/transitions-dev/GUIDE.md) for transitions and motion tokens.
+`app.md` says when to read these, and a report page never needs them: [references/component-policies.md](references/component-policies.md) for per-component counts, behavior, and copy limits; [references/legacy.md](references/legacy.md) for Tailwind CSS v3 and older token names; the [Transitions.dev guide](sub-skills/transitions-dev/GUIDE.md) for transitions and motion tokens. `report.md` offers the report options as checkboxes, and a page reads only the checked ones: [`report-options/inline-translation.md`](report-options/inline-translation.md) and [`report-options/speaker-photos.md`](report-options/speaker-photos.md).
 
 ## Design System
 

@@ -2,11 +2,23 @@
 
 A report page presents findings, an analysis, or a status to readers who were not part of the work. It is one HTML file with no app shell, router, or build step. Every rule in SKILL.md applies. This file adds how to style the page without shadcn or Tailwind, and how to write it.
 
-When the project has its own report skill, template, or builder, that one decides what the page says and how the file is built. The rules here still decide how the page looks.
+## Options
+
+Some rules are optional. Each option is one file in `report-options/`, and each file there has one row in this table.
+
+| Option | Checklist line | Offer when | File |
+|---|---|---|---|
+| Inline translation | Show quotes in the page's language, with the original in a tooltip | The page quotes words in a language other than the page's language | [`report-options/inline-translation.md`](report-options/inline-translation.md) |
+| Speaker photos | Put each speaker's photo before their quotes; the photos go inside the file | The page quotes people, and photos are available for more than half of them | [`report-options/speaker-photos.md`](report-options/speaker-photos.md) |
+
+1. Before writing the page, check each row's "Offer when" against the content.
+2. When one or more options apply, MUST ask the user once, as a single multi-select question with one checkbox per applicable option, labeled with its checklist line. Wait for the answer. Skip the question only when the request already says which options to use, or says to use none.
+3. Read the file of every checked option in full before writing the page. An unchecked option is not applied, and its file is not read.
+4. A checked option's rules win where they differ from this file.
 
 ## Plain CSS
 
-- All CSS sits in one `<style>` block; the width of a bar in a Bars block is the only inline style. The page loads no CSS framework, utility-class runtime, or component library.
+- All CSS sits in one `<style>` block. The markup carries no inline style except the width of a bar in a Bars block; a checked option's script may set positions while the page runs. The page loads no CSS framework, utility-class runtime, or component library.
 - The theme tokens keep their names and values from SKILL.md, declared as custom properties: light values on `:root`, dark values on `:root:not([data-theme="light"])` inside `@media (prefers-color-scheme: dark)`, and the same dark values on `:root[data-theme="dark"]`. Only the tokens the page uses are declared.
 - The type scale and `--shadow-card` from the `@theme` block in SKILL.md are plain custom properties on `:root` here. The two dark rules set `--shadow-card: none`.
 - `--font-sans` is Inter, then the Noto Sans family for the page's language, then system fonts. `--font-mono` is JetBrains Mono, then system monospace fonts. One Google Fonts stylesheet link loads weights 400, 500, and 600 of those families; the system fonts keep the page readable offline.
@@ -91,6 +103,7 @@ A block sits inside a section card, so it has a border but no shadow.
 2. Confirm that the page does not scroll sideways and that every table scrolls inside its wrapper.
 3. Add up every total again and compare every number on the page with its source.
 4. Search the file for HTML comments and unfilled placeholders.
+5. Run the checks in the file of every checked option.
 
 ## Common Mistakes
 
