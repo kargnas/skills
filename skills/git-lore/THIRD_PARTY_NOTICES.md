@@ -6,9 +6,14 @@ Git Lore adapts material from:
 - Revision: eed689c27adbf9dab3f13c07ad3d95b217ed1454
 - Upstream license declaration: MIT
 
+- Project: https://github.com/erensrtky/cogit
+- Revision: 151b25e209555f6e288c7217c02b7fb969df14c2
+- Upstream license: MIT (LICENSE file)
+
 MIT License
 
 Copyright (c) 2026 tmdgusya
+Copyright (c) 2026 Eren Sertkaya
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

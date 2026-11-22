@@ -65,7 +65,7 @@ npx -y skills add kargnas/skills --skill humanizer-kill-gpt
 
 ### `git-lore`
 
-Git trailer로 커밋의 결정 배경을 기록하고 조회하며, 프로젝트 또는 전역 에이전트 지침에 Lore 형식을 설정합니다.
+커밋 메시지에 변경의 목적, 밖에서 보이는 변화, 결정과 결정한 사람, 버린 대안, 남은 일을 Git trailer로 기록합니다. 코드를 고치기 전에 이전 결정을 조회하고, 브랜치의 결정을 PR 설명으로 요약하며, 프로젝트 또는 전역 에이전트 지침에 Lore 형식을 설정합니다. 대화 원문은 커밋에 넣지 않습니다.
 
 ```bash
 npx -y skills add kargnas/skills --skill git-lore
