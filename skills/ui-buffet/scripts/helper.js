@@ -25,7 +25,10 @@
 
   function websocketUrl() {
     const key = sessionKey();
-    return 'ws://' + window.location.host + (key ? '/?key=' + encodeURIComponent(key) : '');
+    // Behind an HTTPS proxy (Tailscale Serve, ngrok) the proxy only speaks TLS, and
+    // browsers block ws:// from an https page, so the socket must follow the page's scheme.
+    const scheme = window.location.protocol === 'https:' ? 'wss://' : 'ws://';
+    return scheme + window.location.host + (key ? '/?key=' + encodeURIComponent(key) : '');
   }
 
   function reloadAfterRecovery() {
