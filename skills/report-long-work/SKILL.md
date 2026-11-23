@@ -30,7 +30,7 @@ Leave out a block that has nothing to say.
 | Block | Holds |
 |---|---|
 | Do now | At most 5 numbered actions that only the reader can take, each with one line of reason and a time estimate. Include what the reader must not do until a condition holds. |
-| Outcome | The few numbers that the result rests on, such as before → after, downtime, test counts, cost. Each one with its basis. |
+| Outcome | One table of the few numbers that the result rests on, such as before → after, downtime, test counts, cost: one row per number, with its unit and its basis. Never KPI cards (tiles that each hold a label and a large number). |
 | Before and after | A node graph of the system before, and one after: components as nodes, arrows labeled with what flows, groups for where a node runs. Mark the nodes that are still a single point. |
 | Order of work | A node graph of the steps in time order, each with its time and its result. Mark outages and destructive steps. |
 | Verification | A table of what was checked and the measured result. Then one line that names what was not tested. |
