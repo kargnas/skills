@@ -40,11 +40,10 @@ Assume a mature codebase with years of history unless the project shows otherwis
    - A concept may break a design rule only if its card names that rule (e.g. `Breaks: one primary button per screen`).
    - Concepts 4 and 5 ignore the project's design rules and keep only its tokens; their cards still name each rule they actually break.
 
-   Build a viral loop, everyday use that brings in new users, into concepts 1-7 when the main task gives it a natural place. Draw concept 8 as the subagent described it.
-   - Find the moment of value: the user has just made or received something worth showing (e.g. a published page, a finished design), or the task needs another person (e.g. a coworker, a client).
-   - Put one share or invite action on the screen where that value appears, never in settings or a separate "refer a friend" screen. Add no other feature for the loop, such as a vote, a reward, or a feed, unless it is the concept's own idea.
-   - Draw what the other person sees: the link or invite opens on that exact thing, says who sent it and what to do next, and lets them act before signing up when the product allows it. A result shown outside the product may carry a small link back to it.
-   - Keep the main task as short as it is without the loop; the click badge counts only the main task. Give each concept with a loop a second badge that names the loop and the number that shows it works (e.g. `Loop: invite link · watch: invitees who finish the task`). If the surface has no natural moment, add no loop and say so once in the subtitle.
+   In concepts 1-7, look for a feature that brings the product new users, spreads it from person to person, or draws more traffic. Build one in only where the user, at that point in the main task, has their own reason to use it. Let each concept find its feature from its own approach, so the features differ across concepts. Draw concept 8 as the subagent described it.
+   - Draw where a new person arrives through the feature and what they can do there.
+   - Keep the main task as short as it is without the feature; the click badge counts only the main task. Give each concept with such a feature a second badge in the form `Growth: <feature> · watch: <number that shows it works>`.
+   - If the main task gives the user no such reason, add the feature to no concept and say so once in the subtitle. If only some concepts have a place for it, say so once on each card without one.
 7. **End your turn** with the URL and a one-line summary, and ask the user to click a concept and reply in the terminal.
 8. **Once the user chooses**, read the click events, push the waiting screen, and carry the build through plan, audit, and verification without asking the user. Stop and ask before committing, pushing, or deleting anything the user did not request.
 9. **Verify** by running the project's tests and lint and confirming the chosen concept renders in the app.
