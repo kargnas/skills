@@ -1,9 +1,9 @@
 ---
-name: work-report
+name: report-long-work
 description: Reports work that an agent finished (a migration, a cutover, a cleanup, a long autonomous task) to a reader who was not there, as an HTML page with node graphs of what changed and in which order, a to-do list for the reader, verification results, and an image of every destructive action. Covers saving the records while the work runs, checking the page, sharing it in a chat channel as paste-ready text with images, and a single-file HTML export. Use when a report is due at the end of agent-run work, or on 이 작업 끝나고 정리해줘. The page's look is the author's own, so no design skill is needed. A page of findings or an analysis with no work to report goes to minimal-frontend.
 ---
 
-# Work Report
+# Report Long Work
 
 The reader was not there. The report tells them what changed, how that was checked, what was destroyed, and what they must do now. It is built from records saved while the work ran, so start step 1 as soon as a request says to report at the end.
 
