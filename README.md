@@ -112,6 +112,16 @@ npx -y skills add kargnas/skills --skill ui-buffet
 npx -y skills add kargnas/skills --skill minimal-frontend
 ```
 
+### `work-report`
+
+에이전트가 끝낸 작업(마이그레이션, 전환, 정리, 긴 자율 작업)을 그 자리에 없던 사람에게 HTML 페이지 하나로 보고합니다. 페이지에는 읽는 사람이 지금 해야 할 일, 결과 수치, 바뀌기 전과 후의 구조와 작업 순서를 보여 주는 노드 그래프, 검증 결과, 파괴적 작업의 기록 이미지가 들어갑니다. 노드를 누르면 그 자리에서 바뀐 내용과 확인 방법, 근거 기록이 열립니다.
+
+보고서는 작업하는 동안 저장한 기록으로 만듭니다. 삭제처럼 되돌릴 수 없는 작업은 `scripts/evidence.sh`로 실행해 작업 전 상태, 대상 확인, 명령, 작업 후 상태를 기록하고, `scripts/report.py`가 그 기록을 터미널 모양 이미지로 만듭니다. `report.py`는 Chrome으로 페이지를 375·800·1280px에서 라이트·다크 모드로 렌더링해 가로 스크롤, 스크립트 오류, 깨진 이미지, 잘린 그래프를 찾습니다. 채팅 채널에 붙여 넣을 이미지와 이미지를 모두 담은 HTML 파일 하나도 만듭니다. 조사 결과나 분석처럼 보고할 작업이 없는 페이지는 `minimal-frontend`가 맡습니다.
+
+```bash
+npx -y skills add kargnas/skills --skill work-report
+```
+
 ### `slack-api-readonly`
 
 Slack 사용자 토큰으로 채널, 스레드 permalink, 검색 결과를 읽기 전용으로 가져와 LLM이 읽기 좋은 마크다운 한 문서로 출력합니다. 사용자 ID를 실명으로 바꾸고 mrkdwn을 풀어 쓰며, 이모지·리액션과 타임존 표기를 유지하고 `--files`로 첨부 파일도 내려받습니다. 데스크톱에서 복사한 Slack 텍스트를 정리하는 필터도 함께 들어 있습니다.
@@ -173,6 +183,7 @@ codex plugin add kargnas-skills@kargnas-plugins
 | [`minimal-patch-with-subagents`](skills/minimal-patch-with-subagents/) | 병렬 서브에이전트 토론으로 확정된 버그의 최소·최저위험 패치 선택 |
 | [`ui-buffet`](skills/ui-buffet/) | Previews several UI/UX design concepts in the browser and builds the pick |
 | [`minimal-frontend`](skills/minimal-frontend/) | shadcn/ui·Tailwind CSS v4 기반 디자인 시스템 기본값, 컨테이너 기반 반응형 규칙, 영역별 비동기 로딩, 적용형 UX 법칙, 컴포넌트별 정책, UI 문구 규칙, CSS 전환 패턴 32개, 같은 디자인을 쓰는 HTML 리포트 페이지 규칙 |
+| [`work-report`](skills/work-report/) | 에이전트가 끝낸 작업을 노드 그래프, 검증 결과, 파괴적 작업 기록 이미지가 담긴 HTML 페이지로 보고 |
 | [`slack-api-readonly`](skills/slack-api-readonly/) | Slack 채널·스레드·검색 결과를 읽기 전용 Web API로 가져와 LLM용 마크다운으로 변환 |
 | [`oss-finder`](skills/oss-finder/) | GitHub 레포·코드를 polish-days 기준으로 찾아 순위화하는 검색 백엔드 툴킷 |
 | [`skill-finder`](skills/skill-finder/) | 설치 가능한 SKILL.md 스킬을 마켓플레이스와 GitHub에서 찾아 semantic polish-days로 순위화 |
