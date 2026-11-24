@@ -1,6 +1,6 @@
 ---
 name: report-long-work
-description: Reports work that an agent finished (a migration, a cutover, a cleanup, a long autonomous task) to a reader who was not there, as an HTML page with node graphs of what changed and in which order, a to-do list for the reader, verification results, and an image of every destructive action. Covers saving the records while the work runs, checking the page, sharing it in a chat channel as paste-ready text with images, and a single-file HTML export. Use when a report is due at the end of agent-run work, or on 이 작업 끝나고 정리해줘. The page's look is the author's own, so no design skill is needed. A page of findings or an analysis with no work to report goes to minimal-frontend.
+description: Reports work that an agent finished (a migration, a cutover, a cleanup, a long autonomous task) to a reader who was not there, as an HTML page with node graphs of what changed and in which order, a to-do list for the reader, verification results, and an image of every destructive action. Covers saving the records while the work runs, checking the page, sharing it in a chat channel as paste-ready text with images, and a single-file HTML export. Use when a report is due at the end of agent-run work, or on 이 작업 끝나고 정리해줘.
 ---
 
 # Report Long Work
@@ -23,7 +23,7 @@ A screen that was not saved cannot be shown later.
 
 ## 2. Build the page
 
-One HTML file, `$T/report/public/index.html`, with its CSS and scripts inside and its images in `shots/` next to it. The look is the author's choice: do not load a design skill for it unless the user names one. The page must be readable in light and dark and on a phone, and use no library and no build step. Only the blocks below and their order are fixed.
+One HTML file, `$T/report/public/index.html`, with its CSS and scripts inside and its images in `shots/` next to it. The page must be readable in light and dark and on a phone. Only the blocks below and their order are fixed.
 
 Leave out a block that has nothing to say.
 
