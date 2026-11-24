@@ -3,7 +3,7 @@ name: minimal-frontend
 description: Design system shared by app UI and standalone HTML report pages, covering theme tokens, type and density scale, status colors, container-first responsive rules, anti-slop, and accessibility. Use when starting frontend work in a project with no existing design system, when building or theming UI with shadcn/ui or Tailwind CSS, when asked to review or audit web UI, or when findings, an analysis, or a status must become an HTML page people read (report page, readable page, 리포트, 보고서, html로 만들어, 보기 쉽게 정리). App rules add URL-first routing, scoped async loading, theme and i18n defaults, applied UX laws, component policies, and UI copy. Report rules add the page skeleton, blocks, wording, and checkbox options for inline translation with original-text tooltips and for speaker photos (인용 번역, 원문 툴팁, 발언자 프사).
 metadata:
   author: kargnas
-  version: "0.11.0"
+  version: "0.12.0"
   argument-hint: <file-or-pattern>
 ---
 
@@ -116,7 +116,7 @@ One status vocabulary for every component (badge, field, toast, chart):
 - Every interactive element has BOTH a visible focus ring (shadcn's `focus-visible:ring-*` + `focus-visible:ring-ring/*` pair) and a `hover:` state. `outline-none`/`outline-hidden` without a visible focus replacement is forbidden.
 - Long-text containers get `wrap-break-word` (`wrap-anywhere` in table cells, where `break-word` cannot shrink the column); flex/grid children that hold text get `min-w-0` (the classic invisible-overflow bug).
 - Every clickable element shows `cursor-pointer` — buttons, links styled as buttons, clickable rows/cards/list items, tabs, chips, icon buttons. `<button>` is NOT exempt, because its default cursor is `default`: one base rule covers it (`button:not(:disabled), [role="button"]:not(:disabled) { cursor: pointer }`). Disabled controls get `cursor-not-allowed`; text inputs keep the I-beam.
-- Every screen is usable on mobile web (375px wide, touch, no hover): nothing is hover-only — an action revealed on `hover:` is also always visible on touch (`pointer-coarse:opacity-100`) or reachable from a tap menu, and horizontal scroll lives only inside tables/code (`overflow-x-auto` on that container), never on the page. Check 375px before calling a screen done.
+- Every screen is usable on mobile web (375px wide, touch, no hover): nothing is hover-only — an action revealed on `hover:` is also always visible on touch (`pointer-coarse:opacity-100`) or reachable from a tap menu, and horizontal scroll lives only inside tables, code, and node graphs (`overflow-x-auto` on that container), never on the page. Check 375px before calling a screen done.
 - Recommended target size: 44×44px under touch (`pointer-coarse:min-h-11`), 24×24px with a fine pointer. A dense table row or toolbar may go smaller. When a small icon needs a bigger target, grow its hit area, not its glyph.
 - Color never carries information alone: pair it with text or an icon (status, errors, chart series).
 - Color pairs outside the theme table (status, chart, and new semantic colors) meet APCA contrast: Lc 75 (90 preferred) for body text, titles, input values, and tooltips; Lc 60 for other text; Lc 30 for placeholder and disabled text.
