@@ -97,7 +97,7 @@ Three things always hold:
 
 - The graph is one inline `<svg>` at its real size: `width` and `height` equal its `viewBox`, so its text stays on the type scale. The `viewBox` ends where the drawing ends, with no empty space around it. The markup holds geometry only, and colors come from classes in the `<style>` block.
 - Nodes line up in rows and columns, and nothing overlaps: text stays inside its node, an arrow never runs through a node, a label, or a group name, and a label sits beside its arrow, clear of both nodes.
-- The graph shows whole at the full column width: it is at most `668px` wide, the inner width of its box at that width. The box has `border`, radius `8px`, `p-3`, and `overflow-x: auto`. The SVG is a block with `margin: 0 auto`, which centers a narrow graph and lets a wide one scroll from its left edge. On a narrower screen the graph scrolls inside the box.
+- The graph shows whole at the full column width: it is at most `668px` wide. That is the `760px` column less the column's padding, and less the padding and borders of the section card and of the box: `760 - 32 - 34 - 26`. The box has `border`, radius `8px`, `p-3`, and `overflow-x: auto`. The SVG is a block with `margin: 0 auto`, which centers a narrow graph and lets a wide one scroll from its left edge. On a narrower screen the graph scrolls inside the box.
 
 | Part | When | Shape |
 |---|---|---|
