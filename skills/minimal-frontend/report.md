@@ -83,10 +83,32 @@ A block sits inside a section card, so it has a border but no shadow.
 |---|---|---|
 | Key figures | The two to four figures the summary rests on | Grid `repeat(auto-fit, minmax(240px, 1fr))` with `gap-3`. Each cell has `p-3`, `border`, and radius `8px`. Label: `text-caption` weight 600 `text-muted-foreground`. Value: `font-mono text-title` weight 600 `tabular-nums`. Then one line that names the source and date of the figure. The value takes `text-kpi` only under the stat-tile rule in SKILL.md |
 | Bars | Amounts compared with each other, or the parts of one total | One row per amount with columns `112px minmax(0, 1fr) 96px` and `gap-3`: the label in `text-muted-foreground`, an `8px` track in `bg-muted` holding a block-level `bg-primary` bar, both with radius `4px`, and the value in `font-mono tabular-nums` aligned right. The bar's width is its share of the largest value, set as an inline `style` percentage. The total row has `border-t`, weight 600, and an empty track cell |
-| Timeline | Events in order | A list with `py-2` on each item and `border-t` between items. Columns `148px minmax(0, 1fr)` with `gap-3`, and one column when the container is narrower than `480px`. The date is `font-mono text-caption text-muted-foreground tabular-nums`. One sentence per event. No dots and no connector line |
+| Timeline | Events in order | A list without markers. Each item is a grid with columns `8px minmax(0, 1fr)` and `gap-x-3`, and every item but the last has `pb-3`. The second column holds the date in `font-mono text-caption text-muted-foreground tabular-nums`, then one sentence for the event on the next line. The item's pseudo-elements draw the rest: in the first column, an `8px` round dot in `bg-muted-foreground` centered on the date's line, and a `2px` line in `border` color that runs behind the dots from each dot's center to the next one's, through the `pb-3` space. The line stops at the last dot |
+| Node graph | Parts that branch, join, or carry details that the reader opens | One inline SVG in a box, as [Node graph](#node-graph) below describes |
 | Table | Records | A wrapper with `overflow-x: auto`, `border`, and radius `8px`. A table with three or more columns keeps `min-width: 520px`, so a narrow screen scrolls it inside the wrapper instead of squeezing its columns. Header cells: `text-caption` weight 500 `text-muted-foreground` on `bg-muted`, on one line. Body cells: `px-4 py-2`, top-aligned, `border-t` between rows. Numbers, dates, and identifiers are `font-mono tabular-nums` on one line. A column of amounts is right-aligned together with its header; every other column is left-aligned. A status in a cell is a Badge; other cell text keeps `text-foreground` |
 | Badge | A status word beside an item | `font-mono text-micro`, `line-height: 18px`, `px-1.5`, radius `4px`, `border`, `bg-muted`, `text-muted-foreground`. A critical or warning badge keeps the `bg-muted` fill and takes its status color for the text and, mixed at 35% with transparent, for the border. A badge always holds a word |
 | Quote | Words taken from a source | Block: `p-3`, `bg-muted`, radius `6px`, no outer margin, then the speaker or source and the time in `text-caption text-muted-foreground`. Inline: quotation marks only. Neither form has a left bar |
+
+### Node graph
+
+Legibility decides every choice in a node graph. Use one when parts branch, join, or carry details that the reader opens; events that need one sentence each are a Timeline. The content picks the direction and the parts: a part appears only when its "When" holds.
+
+Three things always hold:
+
+- The graph is one inline `<svg>` at its real size: `width` and `height` equal its `viewBox`, so its text stays on the type scale. The `viewBox` ends where the drawing ends, with no empty space around it. The markup holds geometry only, and colors come from classes in the `<style>` block.
+- Nodes line up in rows and columns, and nothing overlaps: text stays inside its node, an arrow never runs through a node, a label, or a group name, and a label sits beside its arrow, clear of both nodes.
+- The graph shows whole at the full column width: it is at most `668px` wide. That is the `760px` column less the column's padding, and less the padding and borders of the section card and of the box: `760 - 32 - 34 - 26`. The box has `border`, radius `8px`, `p-3`, and `overflow-x: auto`. The SVG is a block with `margin: 0 auto`, which centers a narrow graph and lets a wide one scroll from its left edge. On a narrower screen the graph scrolls inside the box.
+
+| Part | When | Shape |
+|---|---|---|
+| Direction | Always | Left to right or top to bottom, whichever reads better. Left to right holds about four nodes in a row; a longer flow, or one with long names, runs top to bottom |
+| Node | Always | A rectangle with `bg-card` fill, a `1px` line in `input` color, and radius `6px`. It holds a name in `text-body` weight 500 and at most one note line in `text-caption text-muted-foreground`. A node with a status (SKILL.md, Status colors) writes the status word as its note, in the status color |
+| Arrow | Always | A `1.5px` line in `muted-foreground` color with an arrowhead, straight or with right-angle turns. Its label names what moves along it, in `text-caption text-muted-foreground` |
+| Group | Nodes run in the same place | A `bg-muted` rectangle with radius `8px` and no border behind those nodes, with the group's name at a free corner in `text-caption` weight 600 `text-muted-foreground` |
+| Change marks | The graph shows what a change did | New: `bg-primary` fill and `primary-foreground` text. Changed: a `1.5px` line in `primary` color. Removed: no fill, a dashed line in `muted-foreground` color, and the name in `text-muted-foreground`. A new arrow takes `primary` color, and a removed arrow is dashed. A key above the box names each mark in use, in `text-caption text-muted-foreground` |
+| Details | A node has more to say than its note line holds | Only such a node is a button (`role="button"`, `tabindex="0"`, `aria-pressed`) that a click, Enter, or Space selects, and hover covers it with a rectangle in `accent` color. The selected node gets a `1.5px` ring in `foreground` color, `3px` outside it, so selection never reads as a change mark. Keyboard focus shows on the same ring, in `ring` color at `2px`. A panel under the box (`mt-3`, `p-3`, `border`, radius `8px`) shows the selected node's name in `text-title` weight 600, its mark or status as a Badge, and its details as rows of label and value, with labels in `text-caption` weight 600 `text-muted-foreground`. When the page opens, the first button with a change mark is selected, or the first button when none has a mark. Every node's panel is in the HTML: a script hides all but the selected one, and print shows them all |
+
+These sizes read well: nodes `44px` tall with one shared width, arrows `40px` or longer, and a group edge `12px` from its nodes, with `26px` above them for the group's name.
 
 ## Wording
 
@@ -100,7 +122,7 @@ A block sits inside a section card, so it has a border but no shadow.
 ## Before handing over
 
 1. Open the file in a browser and run the width check from SKILL.md (Layout & Responsive), in light and in dark. Set the viewport width, not the window width, and look at a screenshot of each.
-2. Confirm that the page does not scroll sideways and that every table scrolls inside its wrapper.
+2. Confirm that the page does not scroll sideways and that every table and node graph scrolls inside its wrapper. At 800 and 1280, no node graph scrolls. No arrow runs through a node or a label.
 3. Add up every total again and compare every number on the page with its source.
 4. Search the file for HTML comments and unfilled placeholders.
 5. Run the checks in the file of every checked option.
