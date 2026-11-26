@@ -1,6 +1,7 @@
 ---
 name: minimal-frontend
-description: Design system shared by app UI and standalone HTML report pages, covering theme tokens, type and density scale, status colors, container-first responsive rules, anti-slop, and accessibility. Use when starting frontend work in a project with no existing design system, when building or theming UI with shadcn/ui or Tailwind CSS, when asked to review or audit web UI, or when findings, an analysis, or a status must become an HTML page people read (report page, readable page, 리포트, 보고서, html로 만들어, 보기 쉽게 정리). App rules add URL-first routing, scoped async loading, theme and i18n defaults, applied UX laws, component policies, and UI copy. Report rules add the page skeleton, blocks, wording, and checkbox options for inline translation with original-text tooltips and for speaker photos (인용 번역, 원문 툴팁, 발언자 프사).
+description: A default fallback design system for app UI and standalone HTML report pages, covering theme tokens, type and density scale, status colors, container-first responsive rules, anti-slop, and accessibility.
+when_to_use: Use when starting frontend work in a project with no existing design system, when asked to make a report.
 metadata:
   author: kargnas
   version: "0.11.0"
